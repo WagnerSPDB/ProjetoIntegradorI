@@ -1,0 +1,600 @@
+
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.BevelBorder;
+import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import java.util.*;
+import java.lang.*;
+import javax.swing.table.*;
+import javax.swing.JTable;
+
+
+public class TelaCriarCompeticao extends javax.swing.JFrame {
+    CrudCompeticao crud=new CrudCompeticao();
+    Competicao competicao=new Competicao();
+
+
+    public TelaCriarCompeticao() {
+        initComponents();
+        crud.getCompeticao();
+    }
+
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">
+    private void initComponents() {
+
+        jTabbedPane1 = new javax.swing.JTabbedPane();
+        criar = new javax.swing.JPanel();
+        NomeCompeticao = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        oitoTimes = new javax.swing.JToggleButton();
+        dezesseisTimes = new javax.swing.JToggleButton();
+        quatroTimes = new javax.swing.JToggleButton();
+        mostrar = new javax.swing.JPanel();
+        AtualizarListaCamp = new javax.swing.JToggleButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tbCampeonato = new javax.swing.JTable();
+        atualizar = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        idAtualizar = new javax.swing.JTextField();
+        nomeAtualizar = new javax.swing.JTextField();
+        oitoTimesAtualizar = new javax.swing.JToggleButton();
+        dezesseisTimesAtualizar = new javax.swing.JToggleButton();
+        quatroTimesAtualizar = new javax.swing.JToggleButton();
+        deletar = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        idDeletar = new javax.swing.JTextField();
+        Deletar = new javax.swing.JToggleButton();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jTabbedPane1.setBackground(new java.awt.Color(51, 204, 0));
+        jTabbedPane1.setForeground(new java.awt.Color(255, 255, 255));
+
+        criar.setBackground(new java.awt.Color(255, 255, 255));
+
+        NomeCompeticao.setBackground(new java.awt.Color(102, 102, 102));
+        NomeCompeticao.setFont(new java.awt.Font("Arial", 0, 12)); // NOI18N
+        NomeCompeticao.setForeground(new java.awt.Color(0, 0, 0));
+        NomeCompeticao.setCursor(new java.awt.Cursor(java.awt.Cursor.TEXT_CURSOR));
+
+        jLabel1.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel1.setText("Nome *");
+
+        oitoTimes.setText("8 TIMES");
+        oitoTimes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                oitoTimesActionPerformed(evt);
+            }
+        });
+
+        dezesseisTimes.setText("16 TIMES");
+        dezesseisTimes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dezesseisTimesActionPerformed(evt);
+            }
+        });
+
+        quatroTimes.setText("4 TIMES");
+        quatroTimes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quatroTimesActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout criarLayout = new javax.swing.GroupLayout(criar);
+        criar.setLayout(criarLayout);
+        criarLayout.setHorizontalGroup(
+                criarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(criarLayout.createSequentialGroup()
+                                .addGroup(criarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(criarLayout.createSequentialGroup()
+                                                .addGap(12, 12, 12)
+                                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addComponent(NomeCompeticao, javax.swing.GroupLayout.PREFERRED_SIZE, 239, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(criarLayout.createSequentialGroup()
+                                                .addGap(55, 55, 55)
+                                                .addComponent(quatroTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 145, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(oitoTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(dezesseisTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(300, Short.MAX_VALUE))
+        );
+        criarLayout.setVerticalGroup(
+                criarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(criarLayout.createSequentialGroup()
+                                .addGap(66, 66, 66)
+                                .addGroup(criarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(NomeCompeticao, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(32, 32, 32)
+                                .addGroup(criarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(quatroTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(oitoTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(dezesseisTimes, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(368, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Criar", criar);
+
+        mostrar.setBackground(new java.awt.Color(255, 255, 255));
+
+        AtualizarListaCamp.setText("Atualizar");
+        AtualizarListaCamp.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                AtualizarListaCampActionPerformed(evt);
+            }
+        });
+
+        tbCampeonato.setModel(new javax.swing.table.DefaultTableModel(
+                new Object [][] {
+                        {null, null, null},
+                        {null, null, null},
+                        {null, null, null},
+                        {null, null, null}
+                },
+                new String [] {
+                        "Nome", "Quantidade", "Id"
+                }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                    false, true, true
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jScrollPane1.setViewportView(tbCampeonato);
+        if (tbCampeonato.getColumnModel().getColumnCount() > 0) {
+            tbCampeonato.getColumnModel().getColumn(0).setResizable(false);
+            tbCampeonato.getColumnModel().getColumn(1).setResizable(false);
+            tbCampeonato.getColumnModel().getColumn(2).setResizable(false);
+        }
+
+        javax.swing.GroupLayout mostrarLayout = new javax.swing.GroupLayout(mostrar);
+        mostrar.setLayout(mostrarLayout);
+        mostrarLayout.setHorizontalGroup(
+                mostrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(mostrarLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(AtualizarListaCamp, javax.swing.GroupLayout.PREFERRED_SIZE, 153, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(190, Short.MAX_VALUE))
+        );
+        mostrarLayout.setVerticalGroup(
+                mostrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(mostrarLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(mostrarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 378, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(AtualizarListaCamp, javax.swing.GroupLayout.PREFERRED_SIZE, 50, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(157, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Mostrar", mostrar);
+
+        atualizar.setBackground(new java.awt.Color(255, 255, 255));
+
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel2.setText("Nome novo *");
+
+        jLabel3.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel3.setText("Id*");
+
+        oitoTimesAtualizar.setText("8 Times");
+        oitoTimesAtualizar.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            oitoTimesAtualizarActionPerformed(evt);
+        }
+    });
+
+        dezesseisTimesAtualizar.setText("16 Times");
+        dezesseisTimesAtualizar.addActionListener(new java.awt.event.ActionListener() {
+        public void actionPerformed(java.awt.event.ActionEvent evt) {
+            dezesseisTimesAtualizarActionPerformed(evt);
+        }
+    });
+
+        quatroTimesAtualizar.setText("4 Times");
+        quatroTimesAtualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                quatroTimesAtualizarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout atualizarLayout = new javax.swing.GroupLayout(atualizar);
+        atualizar.setLayout(atualizarLayout);
+        atualizarLayout.setHorizontalGroup(
+                atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(atualizarLayout.createSequentialGroup()
+                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(atualizarLayout.createSequentialGroup()
+                                                .addGap(17, 17, 17)
+                                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                                        .addComponent(jLabel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                                        .addComponent(idAtualizar)
+                                                        .addComponent(nomeAtualizar, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)))
+                                        .addGroup(atualizarLayout.createSequentialGroup()
+                                                .addGap(127, 127, 127)
+                                                .addComponent(quatroTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(oitoTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(18, 18, 18)
+                                                .addComponent(dezesseisTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addContainerGap(323, Short.MAX_VALUE))
+        );
+        atualizarLayout.setVerticalGroup(
+                atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(atualizarLayout.createSequentialGroup()
+                                .addGap(57, 57, 57)
+                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(idAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(18, 18, 18)
+                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(nomeAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGap(49, 49, 49)
+                                .addGroup(atualizarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(oitoTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(dezesseisTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(quatroTimesAtualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(318, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Atualizar", atualizar);
+
+        deletar.setBackground(new java.awt.Color(255, 255, 255));
+        deletar.setForeground(new java.awt.Color(255, 255, 255));
+
+        jLabel4.setForeground(new java.awt.Color(0, 0, 0));
+        jLabel4.setText("Id*");
+
+        Deletar.setText("Deletar");
+        Deletar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                DeletarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout deletarLayout = new javax.swing.GroupLayout(deletar);
+        deletar.setLayout(deletarLayout);
+        deletarLayout.setHorizontalGroup(
+                deletarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(deletarLayout.createSequentialGroup()
+                                .addGap(16, 16, 16)
+                                .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 37, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(idDeletar, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(Deletar, javax.swing.GroupLayout.PREFERRED_SIZE, 147, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(413, Short.MAX_VALUE))
+        );
+        deletarLayout.setVerticalGroup(
+                deletarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(deletarLayout.createSequentialGroup()
+                                .addGap(77, 77, 77)
+                                .addGroup(deletarLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel4)
+                                        .addComponent(idDeletar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(Deletar, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(421, Short.MAX_VALUE))
+        );
+
+        jTabbedPane1.addTab("Deletar", deletar);
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jTabbedPane1)
+        );
+        layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jTabbedPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+
+        pack();
+    }// </editor-fold>
+
+    public class Competicao {
+        private String nomeCompeticao;
+        private int quantidadeTimes;
+        private int id;
+        //private TimesComp times[]= new TimesComp[quantidadeTimes];
+
+        // public TimesComp[] getTimes() {
+        //    return times;
+        // }
+
+        //public void setTimes(TimesComp[] times) {
+        //this.times = times;
+        //}
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getNomeCompeticao() {
+            return nomeCompeticao;
+        }
+
+        public void setNomeCompeticao(String nomeCompeticao) {
+            this.nomeCompeticao = nomeCompeticao;
+        }
+
+        public int getQuantidadeTimes() {
+            return quantidadeTimes;
+        }
+
+        public void setQuantidadeTimes(int quantidadeTimes) {
+            this.quantidadeTimes = quantidadeTimes;
+        }
+    }
+
+    public class CrudCompeticao {
+
+        public void create(Competicao comp) {
+            Connection conexao = null;
+            PreparedStatement pstm = null;
+            String sql = "INSERT INTO competicao (nome,quantidadeTime) VALUES (?,?)";
+
+            try {
+                conexao = ModuloConexao.conector();
+                pstm = conexao.prepareStatement(sql);
+                pstm.setString(1, comp.getNomeCompeticao());
+                pstm.setInt(2, comp.getQuantidadeTimes());
+
+
+                pstm.execute();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            } finally {
+                try {
+                    if (pstm != null) {
+                        pstm.close();
+                    }
+                    if (conexao != null) {
+                        conexao.close();
+                    }
+
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, e);
+                }
+            }
+        }
+
+        public List<Competicao> getCompeticao() {
+            String sql = "SELECT * FROM competicao";
+            List<Competicao> competicao = new ArrayList<Competicao>();
+            Connection conexao = null;
+            PreparedStatement pstm = null;
+            ResultSet rs = null;
+
+            DefaultTableModel modelo= (DefaultTableModel) tbCampeonato.getModel();
+            modelo.setNumRows(0);
+            tbCampeonato.getColumnModel().getColumn(0).setPreferredWidth(50);
+            tbCampeonato.getColumnModel().getColumn(1).setPreferredWidth(20);
+            tbCampeonato.getColumnModel().getColumn(2).setPreferredWidth(20);
+
+            try {
+                conexao = ModuloConexao.conector();
+                pstm = conexao.prepareStatement(sql);
+                rs = pstm.executeQuery();
+                while (rs.next()) {
+                    modelo.addRow(new Object[]{
+                        rs.getString(1),
+                        rs.getInt(2),
+                        rs.getInt(3)
+                    //rs.setTimes(4);
+            });
+
+                }
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            } finally {
+                try {
+                    if (rs != null) {
+                        rs.close();
+                    }
+                    if (pstm != null) {
+                        pstm.close();
+                    }
+                    if (conexao != null) {
+                        conexao.close();
+                    }
+
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, e);
+                }
+            }
+            return competicao;
+        }
+
+        public void update(Competicao comp) {
+            String sql = "UPDATE competicao SET nome=?,quantidadeTime=? WHERE id=?";
+            Connection conexao = null;
+            PreparedStatement pstm = null;
+
+            try {
+                conexao = ModuloConexao.conector();
+                pstm = conexao.prepareStatement(sql);
+                pstm.setString(1, comp.getNomeCompeticao());
+                pstm.setInt(2, comp.getQuantidadeTimes());
+                //pstm.setTimes(3,comp.getTimesComp());
+                pstm.setInt(3, comp.getId());
+
+                pstm.execute();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            } finally {
+                try {
+                    if (pstm != null) {
+                        pstm.close();
+                    }
+                    if (conexao != null) {
+                        conexao.close();
+                    }
+
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, e);
+                }
+            }
+        }
+
+        public void delete(int id) {
+            String sql = "DELETE FROM competicao WHERE id=?";
+            Connection conexao = null;
+            PreparedStatement pstm = null;
+
+            try {
+                conexao = ModuloConexao.conector();
+                pstm = conexao.prepareStatement(sql);
+                pstm.setInt(1, id);
+
+                pstm.execute();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, e);
+            } finally {
+                try {
+                    if (pstm != null) {
+                        pstm.close();
+                    }
+                    if (conexao != null) {
+                        conexao.close();
+                    }
+
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, e);
+                }
+            }
+        }
+    }
+
+    private void quatroTimesActionPerformed(java.awt.event.ActionEvent evt) {
+        JOptionPane.showMessageDialog(null, "Campeonato de 4 times criado!");
+        competicao.setNomeCompeticao(NomeCompeticao.getText());
+        competicao.setQuantidadeTimes(4);
+        crud.create(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato de 4 times criado!");
+    }
+
+    private void oitoTimesActionPerformed(java.awt.event.ActionEvent evt) {
+        competicao.setNomeCompeticao(NomeCompeticao.getText());
+        competicao.setQuantidadeTimes(8);
+        crud.create(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato de 8 times criado!");
+    }
+
+    private void dezesseisTimesActionPerformed(java.awt.event.ActionEvent evt) {
+        competicao.setNomeCompeticao(NomeCompeticao.getText());
+        competicao.setQuantidadeTimes(16);
+        crud.create(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato de 16 times criado!");
+    }
+
+    private void quatroTimesAtualizarActionPerformed(java.awt.event.ActionEvent evt) {
+        int id=Integer.parseInt(idAtualizar.getText());
+        competicao.setId(id);
+        competicao.setNomeCompeticao(nomeAtualizar.getText());
+        competicao.setQuantidadeTimes(4);
+        crud.update(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato atualizado!");
+    }
+
+    private void oitoTimesAtualizarActionPerformed(java.awt.event.ActionEvent evt) {
+        int id=Integer.parseInt(idAtualizar.getText());
+        competicao.setId(id);
+        competicao.setNomeCompeticao(nomeAtualizar.getText());
+        competicao.setQuantidadeTimes(8);
+        crud.update(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato atualizado!");
+    }
+
+    private void dezesseisTimesAtualizarActionPerformed(java.awt.event.ActionEvent evt) {
+        int id=Integer.parseInt(idAtualizar.getText());
+        competicao.setId(id);
+        competicao.setNomeCompeticao(nomeAtualizar.getText());
+        competicao.setQuantidadeTimes(16);
+        crud.update(competicao);
+        JOptionPane.showMessageDialog(null, "Campeonato atualizado!");
+    }
+
+    private void DeletarActionPerformed(java.awt.event.ActionEvent evt) {
+        int id=Integer.parseInt(idDeletar.getText());
+        crud.delete(id);
+        JOptionPane.showMessageDialog(null, "Campeonato deletado!");
+    }
+
+    private void AtualizarListaCampActionPerformed(java.awt.event.ActionEvent evt) {
+        crud.getCompeticao();
+    }
+
+    public static void main(String args[]) {
+
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new TelaCriarCompeticao().setVisible(true);
+            }
+        });
+    }
+
+
+    // Variables declaration - do not modify
+    private javax.swing.JToggleButton AtualizarListaCamp;
+    private javax.swing.JToggleButton Deletar;
+    private javax.swing.JTextField NomeCompeticao;
+    private javax.swing.JPanel atualizar;
+    private javax.swing.JPanel criar;
+    private javax.swing.JPanel deletar;
+    private javax.swing.JToggleButton dezesseisTimes;
+    private javax.swing.JToggleButton dezesseisTimesAtualizar;
+    private javax.swing.JTextField idAtualizar;
+    private javax.swing.JTextField idDeletar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTabbedPane jTabbedPane1;
+    private javax.swing.JPanel mostrar;
+    private javax.swing.JTextField nomeAtualizar;
+    private javax.swing.JToggleButton oitoTimes;
+    private javax.swing.JToggleButton oitoTimesAtualizar;
+    private javax.swing.JToggleButton quatroTimes;
+    private javax.swing.JToggleButton quatroTimesAtualizar;
+    private javax.swing.JTable tbCampeonato;
+    // End of variables declaration
+}
