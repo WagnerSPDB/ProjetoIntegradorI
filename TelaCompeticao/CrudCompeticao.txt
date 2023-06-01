@@ -324,45 +324,6 @@ public class TelaCriarCompeticao extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>
-
-    public class Competicao {
-        private String nomeCompeticao;
-        private int quantidadeTimes;
-        private int id;
-        //private TimesComp times[]= new TimesComp[quantidadeTimes];
-
-        // public TimesComp[] getTimes() {
-        //    return times;
-        // }
-
-        //public void setTimes(TimesComp[] times) {
-        //this.times = times;
-        //}
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
-        }
-
-        public String getNomeCompeticao() {
-            return nomeCompeticao;
-        }
-
-        public void setNomeCompeticao(String nomeCompeticao) {
-            this.nomeCompeticao = nomeCompeticao;
-        }
-
-        public int getQuantidadeTimes() {
-            return quantidadeTimes;
-        }
-
-        public void setQuantidadeTimes(int quantidadeTimes) {
-            this.quantidadeTimes = quantidadeTimes;
-        }
-    }
         public void create(Competicao comp) {
             Connection conexao = null;
             PreparedStatement pstm = null;
@@ -501,7 +462,6 @@ public class TelaCriarCompeticao extends javax.swing.JFrame {
         }
 
     private void quatroTimesActionPerformed(java.awt.event.ActionEvent evt) {
-        JOptionPane.showMessageDialog(null, "Campeonato de 4 times criado!");
         competicao.setNomeCompeticao(NomeCompeticao.getText());
         competicao.setQuantidadeTimes(4);
         create(competicao);
