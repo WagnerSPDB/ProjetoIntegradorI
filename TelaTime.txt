@@ -9,8 +9,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
 import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -24,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Conexao.ModuloConexao;
+import java.awt.Color;
 
 public class TelaTime extends JFrame {
 
@@ -173,25 +174,27 @@ public class TelaTime extends JFrame {
 	}
 	
 	public TelaTime() {
+		setTitle("Sistema de Controle de Times");
 
 		conexao = ModuloConexao.conector();
 
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 874, 406);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 744, 461);
 		contentPane = new JPanel();
+		contentPane.setBackground(new Color(255, 255, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
 		txtNome = new JTextField();
-		txtNome.setBounds(190, 38, 148, 36);
+		txtNome.setBounds(142, 81, 148, 29);
 		contentPane.add(txtNome);
 		txtNome.setColumns(10);
 
 		txtAbreviacao = new JTextField();
 		txtAbreviacao.setColumns(10);
-		txtAbreviacao.setBounds(190, 101, 148, 36);
+		txtAbreviacao.setBounds(142, 154, 148, 29);
 		contentPane.add(txtAbreviacao);
 
 
@@ -201,15 +204,15 @@ public class TelaTime extends JFrame {
 				consultarTime();
 			}
 		});
-		btnRead.setBounds(142, 236, 111, 41);
+		btnRead.setBounds(368, 333, 111, 41);
 		contentPane.add(btnRead);
 
 		JLabel lblNome = new JLabel("* Nome");
-		lblNome.setBounds(127, 49, 45, 13);
+		lblNome.setBounds(49, 89, 45, 13);
 		contentPane.add(lblNome);
 
 		lblAbreviacao = new JLabel("* Abreviação");
-		lblAbreviacao.setBounds(109, 112, 71, 13);
+		lblAbreviacao.setBounds(46, 162, 86, 13);
 		contentPane.add(lblAbreviacao);
 		
 		btnAlterar = new JButton("Alterar");
@@ -218,7 +221,7 @@ public class TelaTime extends JFrame {
 				alterarTime();
 			}
 		});
-		btnAlterar.setBounds(273, 236, 111, 41);
+		btnAlterar.setBounds(207, 333, 111, 41);
 		contentPane.add(btnAlterar);
 		
 		JButton btnRemover = new JButton("Remover");
@@ -227,7 +230,7 @@ public class TelaTime extends JFrame {
 				removerTime();
 			}
 		});
-		btnRemover.setBounds(405, 238, 102, 36);
+		btnRemover.setBounds(526, 333, 111, 41);
 		contentPane.add(btnRemover);
 		
 		JButton btnCarregar = new JButton("Carregar foto");
@@ -236,7 +239,7 @@ public class TelaTime extends JFrame {
 				carregarFoto();
 			}
 		});
-		btnCarregar.setBounds(377, 101, 128, 36);
+		btnCarregar.setBounds(422, 245, 128, 36);
 		contentPane.add(btnCarregar);
 
 		JButton btnTime = new JButton("Inserir");
@@ -245,19 +248,15 @@ public class TelaTime extends JFrame {
 				cadastrarTime();
 			}
 		});
-		btnTime.setBounds(10, 236, 111, 41);
+		btnTime.setBounds(49, 333, 111, 41);
 		contentPane.add(btnTime);
 		
 		
 		lblFoto = new JLabel("");
-		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
+		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/Icone_camera.png")));
 		lblFoto.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		lblFoto.setBounds(556, 26, 256, 256);
+		lblFoto.setBounds(368, 22, 249, 212);
 		contentPane.add(lblFoto);
-
-	
-		
-		
 
 	}
 }
