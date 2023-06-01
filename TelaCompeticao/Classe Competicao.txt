@@ -1,0 +1,41 @@
+package CRUDCompeticao;
+
+public class Competicao {
+    private String nomeCompeticao;
+    private int quantidadeTimes;
+    private int id;
+    //private TimesComp times[]= new TimesComp[quantidadeTimes];
+
+    // public TimesComp[] getTimes() {
+    //    return times;
+    // }
+
+    //public void setTimes(TimesComp[] times) {
+    //this.times = times;
+    //}
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNomeCompeticao() {
+        return nomeCompeticao;
+    }
+
+    public void setNomeCompeticao(String nomeCompeticao) {
+        this.nomeCompeticao = nomeCompeticao;
+    }
+
+    public int getQuantidadeTimes() {
+        return quantidadeTimes;
+    }
+
+    public void setQuantidadeTimes(int quantidadeTimes) {
+        this.quantidadeTimes = quantidadeTimes;
+    }
+}
+
