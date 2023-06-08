@@ -1,0 +1,142 @@
+package Telas;
+
+import java.awt.EventQueue;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import Conexao.ModuloConexao;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import Classes.Time;
+
+import javax.swing.JComboBox;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.Font;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.JTextField;
+import javax.swing.JButton;
+
+public class TelaTeste extends JFrame {
+
+	Connection conexao = null;
+	PreparedStatement pst = null;
+	ResultSet rs = null;
+	private JPanel contentPane;
+	private JTextField txtNome;
+	String teste;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					TelaTeste frame = new TelaTeste();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public TelaTeste() {
+		conexao = ModuloConexao.conector();
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JComboBox cbxQtd = new JComboBox();
+		cbxQtd.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				teste = (String) cbxQtd.getSelectedItem();
+			}
+		});
+		cbxQtd.setFont(new Font("Tahoma", Font.PLAIN, 14));
+		cbxQtd.setModel(new DefaultComboBoxModel(new String[] {"QtdTimes", "4", "8", "16"}));
+		cbxQtd.setMaximumRowCount(4);
+		cbxQtd.setBounds(52, 123, 87, 21);
+		contentPane.add(cbxQtd);
+		
+		txtNome = new JTextField();
+		txtNome.setBounds(52, 72, 96, 19);
+		contentPane.add(txtNome);
+		txtNome.setColumns(10);
+		
+		JButton btnSalvar = new JButton("Salvar");
+		btnSalvar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				criarCompeticao();
+			}
+		});
+		btnSalvar.setBounds(54, 182, 85, 21);
+		contentPane.add(btnSalvar);
+		
+		JComboBox<Time> comboBox = new JComboBox<>();
+		comboBox.setBounds(299, 10, 108, 21);
+		contentPane.add(comboBox);
+		
+		try {
+			String sql = "select * from time";
+			pst = conexao.prepareStatement(sql);
+			rs = pst.executeQuery();
+			List<Time> lista = new ArrayList<>();
+			
+			while (rs.next()) {
+                String nome = rs.getString("nome");
+                String abreviacao = rs.getString("abreviacao");
+                
+                // Criar um objeto com os valores recuperados
+                Time obj = new Time(nome, abreviacao);
+                
+                // Adicionar o objeto à lista
+                lista.add(obj);
+            }
+			
+			for (Time obj : lista) {
+                comboBox.addItem(obj);
+            }
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+		
+	}
+	
+	public void criarCompeticao() {
+		try {
+			String sql = "insert into competicao (nome, quantidadeTime) values (?,?)";
+			pst = conexao.prepareStatement(sql);
+			pst.setString(1, txtNome.getText());
+			pst.setString(2, teste);
+			if (txtNome.getText().isEmpty()) {
+				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
+			} else {
+				int adicionado = pst.executeUpdate();
+				System.out.println(adicionado);
+				if (adicionado > 0) {
+					JOptionPane.showMessageDialog(null, "Usuário adicionado com sucesso");
+					txtNome.setText(null);
+				}
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+	
+}
