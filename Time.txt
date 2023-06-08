@@ -1,0 +1,41 @@
+package Classes;
+
+import com.mysql.cj.jdbc.Blob;
+
+public class Time {
+	String nome;
+	String abreviacao;
+	//Blob foto;
+	
+	public Time(String nome, String abreviacao) {
+        this.nome = nome;
+        this.abreviacao = abreviacao;
+	}
+	public String getNome() {
+		return nome;
+	}
+	public void setNome(String nome) {
+		this.nome = nome;
+	}
+	public String getAbreviacao() {
+		return abreviacao;
+	}
+	public void setAbreviacao(String abreviacao) {
+		this.abreviacao = abreviacao;
+	}
+	/*public Blob getFoto() {
+		return foto;
+	}
+	public void setFoto(Blob foto) {
+		this.foto = foto;
+	}*/
+	
+	@Override
+	public String toString() {
+		return nome;
+	}
+	
+	
+}
+
+
