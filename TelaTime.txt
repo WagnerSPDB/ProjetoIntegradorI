@@ -10,7 +10,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.imageio.ImageIO;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
@@ -18,34 +17,46 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Conexao.ModuloConexao;
+
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
 import java.awt.Color;
+import java.awt.Cursor;
+import javax.swing.SwingConstants;
+import javax.swing.border.CompoundBorder;
+import javax.swing.border.EtchedBorder;
+import java.awt.ComponentOrientation;
 
 public class TelaTime extends JFrame {
 
+	private JPanel contentPane;
 	Connection conexao = null;
 	PreparedStatement pst = null;
 	ResultSet rs = null;
-
-	private JPanel contentPane;
 	private JTextField txtNome;
 	private JTextField txtAbreviacao;
 	private JLabel lblAbreviacao;
 	private JButton btnAlterar;
 	private JLabel lblFoto;
-	
-	//instanciar objeto para o fluxo de bytes
+	private JTextField txtNomeDel;
+	private JTextField txtNomeAlt;
+	private JTextField txtAbreviacaoAlt;
+	private JTextField txtAbreviacaoBus;
+	private JTextField txtNomeBus;
+	private JButton btnBuscar;
+
+	// instanciar objeto para o fluxo de bytes
 	private FileInputStream fis;
-	
-	//variavel global pra armazenar o tamanho da imagem
+
+	// variavel global pra armazenar o tamanho da imagem
 	private int tamanho;
-	
-	
+	private JLabel lblFotoAlt;
+	private JLabel lblFotoBus;
+
 	/**
 	 * Launch the application.
 	 */
@@ -69,7 +80,7 @@ public class TelaTime extends JFrame {
 			pst.setString(1, txtNome.getText());
 			pst.setString(2, txtAbreviacao.getText());
 			pst.setBlob(3, fis, tamanho);
-			//validação dos campos obrigatorios
+			// validação dos campos obrigatorios
 			if (txtNome.getText().isEmpty() || txtAbreviacao.getText().isEmpty()) {
 				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
 			} else {
@@ -79,7 +90,8 @@ public class TelaTime extends JFrame {
 					JOptionPane.showMessageDialog(null, "Usuário adicionado com sucesso");
 					txtNome.setText(null);
 					txtAbreviacao.setText(null);
-					
+					lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+
 				}
 			}
 		} catch (SQLException e) {
@@ -89,47 +101,51 @@ public class TelaTime extends JFrame {
 
 	private void consultarTime() {
 		try {
-			String sql = "select * from time where nome = ?";
+			String sql = "select * from time where nome=?";
 			pst = conexao.prepareStatement(sql);
-			pst.setString(1, txtNome.getText());
+			pst.setString(1, txtNomeBus.getText());
 			rs = pst.executeQuery();
 
 			if (rs.next()) {
-				txtAbreviacao.setText(rs.getString(2));
-				
+				txtAbreviacaoBus.setText(rs.getString(2));
+				// Buscar imagem no banco
+				byte[] fotoDado = rs.getBytes(3);
+				ImageIcon imageIcon = new ImageIcon(fotoDado);
+				Image image = imageIcon.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT);
+				lblFotoBus.setIcon(new ImageIcon(image));
+
 			} else {
 				JOptionPane.showMessageDialog(null, "Time não cadastrado");
-				txtAbreviacao.setText(null);
+				txtAbreviacaoBus.setText(null);
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
 
-	
-	
 	private void alterarTime() {
-		String sql = "update time set abreviacao=? where nome=?";
+		String sql = "update time set abreviacao=?, foto=? where nome=?";
 		try {
 			pst = conexao.prepareStatement(sql);
-			pst.setString(1, txtAbreviacao.getText());
-			pst.setString(2, txtNome.getText());
-			
-			if (txtNome.getText().isEmpty() || txtAbreviacao.getText().isEmpty()) {
+			pst.setString(1, txtAbreviacaoAlt.getText());
+			pst.setString(3, txtNomeAlt.getText());
+			pst.setBlob(2, fis, tamanho);
+
+			if (txtNomeAlt.getText().isEmpty() || txtAbreviacaoAlt.getText().isEmpty()) {
 				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
 			} else {
 				int adicionado = pst.executeUpdate();
 				System.out.println(adicionado);
 				if (adicionado > 0) {
 					JOptionPane.showMessageDialog(null, "Dados alterados com sucesso");
-					txtNome.setText(null);
-					txtAbreviacao.setText(null);
-					lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
-					lblFoto.updateUI();
+					txtNomeAlt.setText(null);
+					txtAbreviacaoAlt.setText(null);
+					lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+					lblFotoAlt.updateUI();
 				}
 			}
-		} catch (Exception e){
-			JOptionPane.showMessageDialog(null, e);
+		} catch (Exception e) {
+			System.out.println(e);
 		}
 	}
 
@@ -139,124 +155,262 @@ public class TelaTime extends JFrame {
 			String sql = "delete from time where nome=?";
 			try {
 				pst = conexao.prepareStatement(sql);
-				pst.setString(1, txtNome.getText());
+				pst.setString(1, txtNomeDel.getText());
 				int apagado = pst.executeUpdate();
 				if (apagado > 0) {
 					JOptionPane.showMessageDialog(null, "Time removido com sucesso");
-					txtNome.setText(null);
-					txtAbreviacao.setText(null);
+					txtNomeDel.setText(null);
 				}
-			} catch (Exception e){
-				JOptionPane.showMessageDialog(null, e);
+			} catch (Exception e) {
+				System.out.println(e);
 			}
 		} else {
-			
+
 		}
 	}
-	
+
 	private void carregarFoto() {
 		JFileChooser jfc = new JFileChooser();
 		jfc.setDialogTitle("Selecionar arquivo");
-		jfc.setFileFilter(new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png","jpg", "jpeg"));
+		jfc.setFileFilter(
+				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
 		int resultado = jfc.showOpenDialog(this);
 		if (resultado == JFileChooser.APPROVE_OPTION) {
 			try {
 				fis = new FileInputStream(jfc.getSelectedFile());
 				tamanho = (int) jfc.getSelectedFile().length();
-				Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(lblFoto.getWidth(), lblFoto.getHeight(), Image.SCALE_SMOOTH);
+				Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(lblFoto.getWidth(),
+						lblFoto.getHeight(), Image.SCALE_SMOOTH);
 				lblFoto.setIcon(new ImageIcon(foto));
 				lblFoto.updateUI();
 			} catch (Exception e) {
 				System.out.println(e);
 			}
 		}
-	
 	}
-	
+
+	private void carregarFotoAlt() {
+		JFileChooser jfc = new JFileChooser();
+		jfc.setDialogTitle("Selecionar arquivo");
+		jfc.setFileFilter(
+				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
+		int resultado = jfc.showOpenDialog(this);
+		if (resultado == JFileChooser.APPROVE_OPTION) {
+			try {
+				fis = new FileInputStream(jfc.getSelectedFile());
+				tamanho = (int) jfc.getSelectedFile().length();
+				Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(lblFotoAlt.getWidth(),
+						lblFotoAlt.getHeight(), Image.SCALE_SMOOTH);
+				lblFotoAlt.setIcon(new ImageIcon(foto));
+				lblFotoAlt.updateUI();
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+	}
+
+	/**
+	 * Create the frame.
+	 */
 	public TelaTime() {
-		setTitle("Sistema de Controle de Times");
-
 		conexao = ModuloConexao.conector();
-
+		setResizable(false);
+		setTitle("Sistema de Controle de Times");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 744, 461);
+		setBounds(100, 100, 516, 362);
 		contentPane = new JPanel();
-		contentPane.setBackground(new Color(255, 255, 255));
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		txtNome = new JTextField();
-		txtNome.setBounds(142, 81, 148, 29);
-		contentPane.add(txtNome);
-		txtNome.setColumns(10);
-
-		txtAbreviacao = new JTextField();
-		txtAbreviacao.setColumns(10);
-		txtAbreviacao.setBounds(142, 154, 148, 29);
-		contentPane.add(txtAbreviacao);
-
-
-		JButton btnRead = new JButton("Buscar");
-		btnRead.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				consultarTime();
-			}
-		});
-		btnRead.setBounds(368, 333, 111, 41);
-		contentPane.add(btnRead);
+		JTabbedPane aba = new JTabbedPane(JTabbedPane.TOP);
+		aba.setBounds(0, 0, 513, 323);
+		aba.setBackground(new Color(240, 240, 240));
+		JPanel inserir = new JPanel();
+		inserir.setBackground(new Color(255, 255, 255));
+		JPanel deletar = new JPanel();
+		deletar.setBackground(new Color(255, 255, 255));
+		JPanel alterar = new JPanel();
+		alterar.setBackground(new Color(255, 255, 255));
+		aba.addTab("Inserir", inserir);
+		inserir.setLayout(null);
 
 		JLabel lblNome = new JLabel("* Nome");
-		lblNome.setBounds(49, 89, 45, 13);
-		contentPane.add(lblNome);
+		lblNome.setBounds(24, 56, 56, 14);
+		inserir.add(lblNome);
+
+		txtNome = new JTextField();
+		txtNome.setColumns(10);
+		txtNome.setBounds(108, 53, 142, 20);
+		txtNome.setColumns(10);
+		inserir.add(txtNome);
 
 		lblAbreviacao = new JLabel("* Abreviação");
-		lblAbreviacao.setBounds(46, 162, 86, 13);
-		contentPane.add(lblAbreviacao);
-		
-		btnAlterar = new JButton("Alterar");
-		btnAlterar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				alterarTime();
-			}
-		});
-		btnAlterar.setBounds(207, 333, 111, 41);
-		contentPane.add(btnAlterar);
-		
-		JButton btnRemover = new JButton("Remover");
-		btnRemover.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				removerTime();
-			}
-		});
-		btnRemover.setBounds(526, 333, 111, 41);
-		contentPane.add(btnRemover);
-		
+		lblAbreviacao.setBounds(24, 116, 76, 14);
+		inserir.add(lblAbreviacao);
+
+		txtAbreviacao = new JTextField();
+		txtAbreviacao.setBounds(108, 113, 86, 20);
+		inserir.add(txtAbreviacao);
+		txtAbreviacao.setColumns(10);
+
+		lblFoto = new JLabel("");
+		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+		lblFoto.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		lblFoto.setBounds(334, 37, 140, 140);
+		inserir.add(lblFoto);
+
 		JButton btnCarregar = new JButton("Carregar foto");
+		btnCarregar.setBorder(null);
+		btnCarregar.setForeground(new Color(255, 255, 255));
+		btnCarregar.setBackground(new Color(51, 153, 0));
+		btnCarregar.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnCarregar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				carregarFoto();
 			}
 		});
-		btnCarregar.setBounds(422, 245, 128, 36);
-		contentPane.add(btnCarregar);
+		btnCarregar.setBounds(351, 188, 105, 31);
+		inserir.add(btnCarregar);
 
 		JButton btnTime = new JButton("Inserir");
+		btnTime.setBorder(null);
+		btnTime.setForeground(new Color(255, 255, 255));
+		btnTime.setBackground(new Color(51, 153, 0));
+		btnTime.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnTime.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				cadastrarTime();
 			}
 		});
-		btnTime.setBounds(49, 333, 111, 41);
-		contentPane.add(btnTime);
-		
-		
-		lblFoto = new JLabel("");
-		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/Icone_camera.png")));
-		lblFoto.setBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null));
-		lblFoto.setBounds(368, 22, 249, 212);
-		contentPane.add(lblFoto);
+		btnTime.setBounds(199, 253, 111, 31);
+		inserir.add(btnTime);
 
+		JButton btnRemover = new JButton("Remover");
+		btnRemover.setBorder(null);
+		btnRemover.setForeground(new Color(255, 255, 255));
+		btnRemover.setBackground(new Color(51, 153, 0));
+		btnRemover.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnRemover.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				removerTime();
+			}
+		});
+		deletar.setLayout(null);
+		btnRemover.setBounds(193, 121, 107, 35);
+		deletar.add(btnRemover);
+
+		JLabel lblInsiraONome = new JLabel("Insira o nome do time que deseja deletar:");
+		lblInsiraONome.setBounds(26, 45, 236, 14);
+		deletar.add(lblInsiraONome);
+
+		txtNomeDel = new JTextField();
+		txtNomeDel.setBounds(304, 42, 144, 20);
+		deletar.add(txtNomeDel);
+		txtNomeDel.setColumns(10);
+
+		JButton btnCarregarAlt = new JButton("Carregar foto");
+		btnCarregarAlt.setBorder(null);
+		btnCarregarAlt.setForeground(new Color(255, 255, 255));
+		btnCarregarAlt.setBackground(new Color(51, 153, 0));
+		btnCarregarAlt.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnCarregarAlt.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				carregarFotoAlt();
+			}
+		});
+		btnCarregarAlt.setBounds(329, 176, 102, 31);
+		alterar.add(btnCarregarAlt);
+
+		aba.addTab("Alterar", alterar);
+		btnAlterar = new JButton("Alterar");
+		btnAlterar.setBorder(null);
+		btnAlterar.setForeground(new Color(255, 255, 255));
+		btnAlterar.setBackground(new Color(51, 153, 0));
+		btnAlterar.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnAlterar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				alterarTime();
+			}
+		});
+		alterar.setLayout(null);
+		btnAlterar.setBounds(205, 253, 96, 31);
+		alterar.add(btnAlterar);
+		aba.addTab("Remover", deletar);
+
+		JLabel lblNewLabel = new JLabel("Insira o nome do time que deseja alterar:");
+		lblNewLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		lblNewLabel.setBounds(20, 37, 300, 14);
+		alterar.add(lblNewLabel);
+
+		txtNomeAlt = new JTextField();
+		txtNomeAlt.setBounds(20, 60, 183, 20);
+		alterar.add(txtNomeAlt);
+		txtNomeAlt.setColumns(10);
+
+		JLabel lblNewLabel_1 = new JLabel("Abreviação:");
+		lblNewLabel_1.setBounds(20, 91, 83, 14);
+		alterar.add(lblNewLabel_1);
+
+		txtAbreviacaoAlt = new JTextField();
+		txtAbreviacaoAlt.setBounds(20, 116, 86, 20);
+		alterar.add(txtAbreviacaoAlt);
+		txtAbreviacaoAlt.setColumns(10);
+
+		lblFotoAlt = new JLabel("");
+		lblFotoAlt.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+		lblFotoAlt.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		lblFotoAlt.setBounds(309, 25, 140, 140);
+		alterar.add(lblFotoAlt);
+
+		JPanel buscar = new JPanel();
+		buscar.setBorder(null);
+		buscar.setBackground(new Color(255, 255, 255));
+		aba.addTab("Buscar", buscar);
+		buscar.setLayout(null);
+
+		JLabel lblBuscarNome = new JLabel("Insira o nome do time que deseja buscar:");
+		lblBuscarNome.setBounds(22, 43, 302, 14);
+		buscar.add(lblBuscarNome);
+
+		txtNomeBus = new JTextField();
+		txtNomeBus.setBounds(20, 68, 171, 20);
+		buscar.add(txtNomeBus);
+		txtNomeBus.setColumns(10);
+
+		JLabel lblAbreviacaoBus = new JLabel("Abreviação:");
+		lblAbreviacaoBus.setBounds(22, 107, 83, 14);
+		buscar.add(lblAbreviacaoBus);
+
+		txtAbreviacaoBus = new JTextField();
+		txtAbreviacaoBus.setBounds(22, 132, 86, 20);
+		buscar.add(txtAbreviacaoBus);
+		txtAbreviacaoBus.setColumns(10);
+
+		lblFotoBus = new JLabel("");
+		lblFotoBus.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFotoBus.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+		lblFotoBus.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
+		lblFotoBus.setBounds(290, 22, 159, 158);
+		buscar.add(lblFotoBus);
+
+		btnBuscar = new JButton("Buscar");
+		btnBuscar.setBorder(null);
+		btnBuscar.setForeground(new Color(255, 255, 255));
+		btnBuscar.setBackground(new Color(51, 153, 0));
+		btnBuscar.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnBuscar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				consultarTime();
+			}
+		});
+		buscar.setLayout(null);
+		btnBuscar.setBounds(203, 231, 96, 31);
+		buscar.add(btnBuscar);
+
+		contentPane.add(aba);
 	}
 }
