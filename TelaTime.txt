@@ -23,7 +23,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 import Conexao.ModuloConexao;
+
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.Color;
@@ -46,11 +48,7 @@ public class TelaTime extends JFrame {
 	private JTextField txtNomeDel;
 	private JTextField txtNomeAlt;
 	private JTextField txtAbreviacaoAlt;
-	private JTextField txtAbreviacaoBus;
-	private JTextField txtNomeBus;
-	private JButton btnBuscar;
 	private JLabel lblFotoAlt;
-	private JLabel lblFotoBus;
 	private int idUsuario;
 
 	private JLabel lblTime;
@@ -68,6 +66,7 @@ public class TelaTime extends JFrame {
 	 */
 
 	public void cadastrarTime() {
+
 		try {
 			String sql = "insert into time (nome, abreviacao, foto, Id_usuario) values (?,?,?,?)";
 			pst = conexao.prepareStatement(sql);
@@ -86,7 +85,7 @@ public class TelaTime extends JFrame {
 					JOptionPane.showMessageDialog(null, "Usuário adicionado com sucesso");
 					txtNome.setText(null);
 					txtAbreviacao.setText(null);
-					lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+					lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 
 				}
 			}
@@ -95,29 +94,6 @@ public class TelaTime extends JFrame {
 		}
 	}
 
-	private void consultarTime() {
-		try {
-			String sql = "select * from time where nome=?";
-			pst = conexao.prepareStatement(sql);
-			pst.setString(1, txtNomeBus.getText());
-			rs = pst.executeQuery();
-
-			if (rs.next()) {
-				txtAbreviacaoBus.setText(rs.getString(2));
-				// Buscar imagem no banco
-				byte[] fotoDado = rs.getBytes(3);
-				ImageIcon imageIcon = new ImageIcon(fotoDado);
-				Image image = imageIcon.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT);
-				lblFotoBus.setIcon(new ImageIcon(image));
-
-			} else {
-				JOptionPane.showMessageDialog(null, "Time não cadastrado");
-				txtAbreviacaoBus.setText(null);
-			}
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e);
-		}
-	}
 
 	private void alterarTime() {
 		String sql = "update time set abreviacao=?, foto=? where nome=?";
@@ -136,7 +112,7 @@ public class TelaTime extends JFrame {
 					JOptionPane.showMessageDialog(null, "Dados alterados com sucesso");
 					txtNomeAlt.setText(null);
 					txtAbreviacaoAlt.setText(null);
-					lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+					lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 					lblFotoAlt.updateUI();
 				}
 			}
@@ -212,7 +188,7 @@ public class TelaTime extends JFrame {
 			pst.setString(1, time.getNome());
 			rs = pst.executeQuery();
 			if (rs.next()) {
-				txtTeste.setText(rs.getString(2));
+				txtTeste.setText(rs.getString(3));
 				byte[] fotoDado = rs.getBytes(4);
 				ImageIcon imageIcon = new ImageIcon(fotoDado);
 				Image image = imageIcon.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT);
@@ -277,7 +253,7 @@ public class TelaTime extends JFrame {
 
 		lblFoto = new JLabel("");
 		lblFoto.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+		lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 		lblFoto.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		lblFoto.setBounds(334, 37, 140, 140);
 		inserir.add(lblFoto);
@@ -381,7 +357,7 @@ public class TelaTime extends JFrame {
 
 		lblFotoAlt = new JLabel("");
 		lblFotoAlt.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
+		lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 		lblFotoAlt.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
 		lblFotoAlt.setBounds(309, 25, 140, 140);
 		alterar.add(lblFotoAlt);
@@ -393,12 +369,16 @@ public class TelaTime extends JFrame {
 		buscar.setLayout(null);
 
 		txtTeste = new JTextField();
-		txtTeste.setBounds(350, 208, 96, 19);
+		txtTeste.setBounds(331, 225, 96, 19);
 		buscar.add(txtTeste);
 		txtTeste.setColumns(10);
 
 		lblTime = new JLabel("");
-		lblTime.setBounds(293, 28, 171, 149);
+		lblTime.setHorizontalAlignment(SwingConstants.CENTER);
+		lblTime.setHorizontalTextPosition(SwingConstants.CENTER);
+		lblTime.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
+		lblTime.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		lblTime.setBounds(311, 28, 140, 140);
 		buscar.add(lblTime);
 
 		JComboBox<Time> cbxTime = new JComboBox<>();
@@ -414,7 +394,7 @@ public class TelaTime extends JFrame {
 				}
 			}
 		});
-		cbxTime.setBounds(172, 104, 108, 21);
+		cbxTime.setBounds(48, 68, 108, 21);
 		buscar.add(cbxTime);
 
 		try {
@@ -443,44 +423,15 @@ public class TelaTime extends JFrame {
 			JOptionPane.showMessageDialog(null, e);
 		}
 
-		JLabel lblBuscarNome = new JLabel("Insira o nome do time que deseja buscar:");
+		JLabel lblBuscarNome = new JLabel("Insira o time que deseja buscar:");
 		lblBuscarNome.setBounds(22, 43, 302, 14);
 		buscar.add(lblBuscarNome);
-
-		txtNomeBus = new JTextField();
-		txtNomeBus.setBounds(20, 68, 171, 20);
-		buscar.add(txtNomeBus);
-		txtNomeBus.setColumns(10);
-
-		JLabel lblAbreviacaoBus = new JLabel("Abreviação:");
-		lblAbreviacaoBus.setBounds(22, 107, 83, 14);
-		buscar.add(lblAbreviacaoBus);
-
-		txtAbreviacaoBus = new JTextField();
-		txtAbreviacaoBus.setBounds(22, 132, 86, 20);
-		buscar.add(txtAbreviacaoBus);
-		txtAbreviacaoBus.setColumns(10);
-
-		lblFotoBus = new JLabel("");
-		lblFotoBus.setHorizontalAlignment(SwingConstants.CENTER);
-		lblFotoBus.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
-		lblFotoBus.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		lblFotoBus.setBounds(0, 180, 108, 110);
-		buscar.add(lblFotoBus);
-
-		btnBuscar = new JButton("Buscar");
-		btnBuscar.setBorder(null);
-		btnBuscar.setForeground(new Color(255, 255, 255));
-		btnBuscar.setBackground(new Color(51, 153, 0));
-		btnBuscar.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		btnBuscar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				consultarTime();
-			}
-		});
 		buscar.setLayout(null);
-		btnBuscar.setBounds(203, 231, 96, 31);
-		buscar.add(btnBuscar);
+		
+		JLabel lblNewLabel_2 = new JLabel("Abreviação:");
+		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel_2.setBounds(331, 200, 96, 14);
+		buscar.add(lblNewLabel_2);
 		contentPane.add(aba);
 	}
 
@@ -496,5 +447,6 @@ public class TelaTime extends JFrame {
 		int id = 0;
 		TelaTime frame = new TelaTime(id);
 		frame.setVisible(true);
+
 	}
 }
