@@ -1,6 +1,5 @@
 package Telas;
 
-import java.awt.EventQueue;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,9 +8,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import Telas.Time;
 import javax.imageio.ImageIO;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,15 +23,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import Conexao.ModuloConexao;
-
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import java.awt.Color;
 import java.awt.Cursor;
 import javax.swing.SwingConstants;
-import javax.swing.border.CompoundBorder;
 import javax.swing.border.EtchedBorder;
 import java.awt.ComponentOrientation;
 
@@ -48,38 +49,33 @@ public class TelaTime extends JFrame {
 	private JTextField txtAbreviacaoBus;
 	private JTextField txtNomeBus;
 	private JButton btnBuscar;
+	private JLabel lblFotoAlt;
+	private JLabel lblFotoBus;
+	private int idUsuario;
+
+	private JLabel lblTime;
+	Time teste;
+	private JTextField txtTeste;
 
 	// instanciar objeto para o fluxo de bytes
 	private FileInputStream fis;
 
 	// variavel global pra armazenar o tamanho da imagem
 	private int tamanho;
-	private JLabel lblFotoAlt;
-	private JLabel lblFotoBus;
 
 	/**
 	 * Launch the application.
 	 */
-	public static void main(String[] args) {
-		EventQueue.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					TelaTime frame = new TelaTime();
-					frame.setVisible(true);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});
-	}
 
 	public void cadastrarTime() {
 		try {
-			String sql = "insert into time (nome, abreviacao, foto) values (?,?,?)";
+			String sql = "insert into time (nome, abreviacao, foto, Id_usuario) values (?,?,?,?)";
 			pst = conexao.prepareStatement(sql);
 			pst.setString(1, txtNome.getText());
 			pst.setString(2, txtAbreviacao.getText());
 			pst.setBlob(3, fis, tamanho);
+			System.out.println("criar: " + idUsuario);
+			pst.setInt(4, idUsuario);
 			// validação dos campos obrigatorios
 			if (txtNome.getText().isEmpty() || txtAbreviacao.getText().isEmpty()) {
 				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
@@ -95,7 +91,7 @@ public class TelaTime extends JFrame {
 				}
 			}
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e);
+			System.out.println(e);
 		}
 	}
 
@@ -209,10 +205,34 @@ public class TelaTime extends JFrame {
 		}
 	}
 
+	public void recuperarTime(Time time) {
+		try {
+			String sql = "select * from time where nome=?";
+			pst = conexao.prepareStatement(sql);
+			pst.setString(1, time.getNome());
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				txtTeste.setText(rs.getString(2));
+				byte[] fotoDado = rs.getBytes(4);
+				ImageIcon imageIcon = new ImageIcon(fotoDado);
+				Image image = imageIcon.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT);
+				lblTime.setIcon(new ImageIcon(image));
+			} else {
+				JOptionPane.showMessageDialog(null, "Time não cadastrado");
+				txtTeste.setText(null);
+			}
+
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+
 	/**
 	 * Create the frame.
 	 */
-	public TelaTime() {
+	public TelaTime(int id) {
+		this.idUsuario = id;
+
 		conexao = ModuloConexao.conector();
 		setResizable(false);
 		setTitle("Sistema de Controle de Times");
@@ -372,6 +392,57 @@ public class TelaTime extends JFrame {
 		aba.addTab("Buscar", buscar);
 		buscar.setLayout(null);
 
+		txtTeste = new JTextField();
+		txtTeste.setBounds(350, 208, 96, 19);
+		buscar.add(txtTeste);
+		txtTeste.setColumns(10);
+
+		lblTime = new JLabel("");
+		lblTime.setBounds(293, 28, 171, 149);
+		buscar.add(lblTime);
+
+		JComboBox<Time> cbxTime = new JComboBox<>();
+		cbxTime.setModel(new DefaultComboBoxModel(new String[] { "Selecione" }));
+		cbxTime.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (cbxTime.getSelectedItem() == "Selecione") {
+					txtTeste.setText(null);
+					lblTime.setIcon(null);
+				} else {
+					teste = (Time) cbxTime.getSelectedItem();
+					recuperarTime(teste);
+				}
+			}
+		});
+		cbxTime.setBounds(172, 104, 108, 21);
+		buscar.add(cbxTime);
+
+		try {
+			String sql = "select * from time where Id_usuario = ?";
+			pst = conexao.prepareStatement(sql);
+			pst.setInt(1, idUsuario);
+			rs = pst.executeQuery();
+			List<Time> lista = new ArrayList<>();
+
+			while (rs.next()) {
+				String nome = rs.getString("nome");
+				String abreviacao = rs.getString("abreviacao");
+				int id_usuario = rs.getInt("id_usuario");
+
+				// Criar um objeto com os valores recuperados
+				Time obj = new Time(nome, abreviacao, id_usuario);
+
+				// Adicionar o objeto à lista
+				lista.add(obj);
+			}
+
+			for (Time obj : lista) {
+				cbxTime.addItem(obj);
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+
 		JLabel lblBuscarNome = new JLabel("Insira o nome do time que deseja buscar:");
 		lblBuscarNome.setBounds(22, 43, 302, 14);
 		buscar.add(lblBuscarNome);
@@ -394,7 +465,7 @@ public class TelaTime extends JFrame {
 		lblFotoBus.setHorizontalAlignment(SwingConstants.CENTER);
 		lblFotoBus.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera_icon.png")));
 		lblFotoBus.setBorder(new EtchedBorder(EtchedBorder.RAISED, null, null));
-		lblFotoBus.setBounds(290, 22, 159, 158);
+		lblFotoBus.setBounds(0, 180, 108, 110);
 		buscar.add(lblFotoBus);
 
 		btnBuscar = new JButton("Buscar");
@@ -410,7 +481,20 @@ public class TelaTime extends JFrame {
 		buscar.setLayout(null);
 		btnBuscar.setBounds(203, 231, 96, 31);
 		buscar.add(btnBuscar);
-
 		contentPane.add(aba);
+	}
+
+	public int getIdUsuario() {
+		return idUsuario;
+	}
+
+	public void setIdUsuario(int idUsuario) {
+		this.idUsuario = idUsuario;
+	}
+
+	public static void main(String[] args) {
+		int id = 0;
+		TelaTime frame = new TelaTime(id);
+		frame.setVisible(true);
 	}
 }
