@@ -1,15 +1,23 @@
-package Classes;
+package Telas;
 
 import com.mysql.cj.jdbc.Blob;
 
 public class Time {
 	String nome;
 	String abreviacao;
+	int id_usuario;
 	//Blob foto;
 	
-	public Time(String nome, String abreviacao) {
+	public int getId_usuario() {
+		return id_usuario;
+	}
+	public void setId_usuario(int id_usuario) {
+		this.id_usuario = id_usuario;
+	}
+	public Time(String nome, String abreviacao, int id_usuario) {
         this.nome = nome;
         this.abreviacao = abreviacao;
+        this.id_usuario = id_usuario;
 	}
 	public String getNome() {
 		return nome;
@@ -37,5 +45,3 @@ public class Time {
 	
 	
 }
-
-
