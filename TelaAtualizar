@@ -1,0 +1,213 @@
+package Telas;
+
+import java.awt.EventQueue;
+import java.awt.Image;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import Classes.Usuario;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.awt.Color;
+
+public class TelaAtualizar extends JFrame {
+
+	private static final long serialVersionUID = 1L;
+	private JPanel contentPane;
+	private JLabel lblImagem;
+	private JTextField Txtusuario;
+	private JTextField txtEmail;
+	private JTextField TxtSenha;
+	private JButton btnAtualizar;
+	private JButton btnAddFoto;
+	private JTextField txtFoto;
+
+	    private Usuario usu;
+	    private TelaPrincipal telaPrincipal;
+	    private TelaPerfil perfil;
+	    
+		public static void main(String[] args) {
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					try {
+						Usuario usu = new Usuario();
+						TelaPrincipal telaPrincipal = new TelaPrincipal(usu);
+						TelaPerfil perfil = new TelaPerfil(usu, telaPrincipal);
+						TelaAtualizar frame = new TelaAtualizar(usu, telaPrincipal, perfil);
+						frame.setVisible(true);
+						frame.setLocationRelativeTo(null);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}
+
+	    public TelaAtualizar(Usuario usuario, TelaPrincipal telaPrincipal, TelaPerfil perfil) {
+	        this.usu = usuario;
+	        this.telaPrincipal = telaPrincipal;
+	        this.perfil = perfil;
+
+		setTitle("ATUALIZAR DADOS");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 554, 319);
+		contentPane = new JPanel();
+		contentPane.setBackground(new Color(255, 255, 255));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLocationRelativeTo(null);
+
+		JPanel panel = new JPanel();
+		panel.setBounds(361, 51, 122, 107);
+		contentPane.add(panel);
+		setContentPane(contentPane);
+
+		ImageIcon imageIcon = new ImageIcon(usu.getFoto());
+		Image imagem = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+		imageIcon = new ImageIcon(imagem);
+		lblImagem = new JLabel(imageIcon);
+		lblImagem.setBounds(164, 82, 78, -69);
+		contentPane.setLayout(null);
+		panel.add(lblImagem);
+
+		// Adicionando o campo de atualização do nome de usuário
+		JLabel lblUsername = new JLabel("Nome de usuário:");
+		lblUsername.setBounds(37, 75, 105, 14);
+		getContentPane().add(lblUsername);
+
+		Txtusuario = new JTextField(usu.getNome(), 20);
+		Txtusuario.setBounds(152, 72, 174, 20);
+		getContentPane().add(Txtusuario);
+
+		// Adicionando o campo de atualização do email do usuário
+		JLabel lblEmail = new JLabel("Email:");
+		lblEmail.setBounds(37, 123, 46, 14);
+		getContentPane().add(lblEmail);
+
+		txtEmail = new JTextField(usu.getEmail(), 20);
+		txtEmail.setBounds(102, 120, 224, 20);
+		getContentPane().add(txtEmail);
+
+		// Adicionando o campo de atualização da senha do usuário
+		JLabel lblPassword = new JLabel("Senha:");
+		lblPassword.setBounds(37, 173, 46, 14);
+		getContentPane().add(lblPassword);
+		
+		TxtSenha = new JTextField(usu.getSenha(), 20);
+		TxtSenha.setBounds(102, 170, 166, 20);
+		getContentPane().add(TxtSenha);
+
+		btnAddFoto = new JButton("Adicionar Foto");
+		btnAddFoto.setForeground(new Color(255, 255, 255));
+		btnAddFoto.setBackground(new Color(51, 153, 0));
+		btnAddFoto.setBorder(null);
+		btnAddFoto.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser arquivo = new JFileChooser();
+				arquivo.setDialogTitle("SELECIONE UMA IMAGEM");
+				arquivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
+				int op = arquivo.showOpenDialog(null);
+				if (op == JFileChooser.APPROVE_OPTION) {
+					File selectedFile = arquivo.getSelectedFile();
+					ImageIcon imageIcon = new ImageIcon(selectedFile.getAbsolutePath());
+					String caminho = selectedFile.getAbsolutePath();
+					caminho = caminho.replace("\\", "/");
+					txtFoto.setText(caminho);
+					Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+					imageIcon = new ImageIcon(image);
+					lblImagem.setIcon(imageIcon);				
+				} else if (op == JFileChooser.CANCEL_OPTION) {
+					System.out.println("No Data");
+				}
+			}
+
+		});
+
+		txtFoto = new JTextField(usu.getFoto());
+		txtFoto.setVisible(false);
+		txtFoto.setBounds(385, 201, 86, 20);
+		contentPane.add(txtFoto);
+		txtFoto.setColumns(10);
+
+		btnAddFoto.setBounds(361, 169, 122, 23);
+		getContentPane().add(btnAddFoto);
+
+		// Adicionando o botão para atualizar as informações do usuário
+		btnAtualizar = new JButton("Atualizar informações");
+		btnAtualizar.setForeground(new Color(255, 255, 255));
+		btnAtualizar.setBackground(new Color(51, 153, 0));
+		btnAtualizar.setBorder(null);
+		btnAtualizar.setBounds(160, 234, 166, 23);
+		btnAtualizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+					Statement stmt = conn.createStatement();
+					String query = "UPDATE usuario SET";
+					if (!Txtusuario.getText().equals(usu.getNome())) {
+					    query += " nome='" + Txtusuario.getText() + "',";
+					    usu.setNome(Txtusuario.getText());
+					    telaPrincipal.atualizarFotoENome(usu.getFoto(), usu.getNome());
+					    perfil.atualizarFotoENomeEEmail(usu.getFoto(), usu.getNome(), usu.getEmail());
+					}
+					if (!txtEmail.getText().equals(usu.getEmail())) {
+						query += " email ='" + txtEmail.getText() + "',";
+						usu.setEmail(txtEmail.getText());
+						 perfil.atualizarFotoENomeEEmail(usu.getFoto(), usu.getNome(), usu.getEmail());
+					}
+					if (!new String(TxtSenha.getText()).equals(usu.getSenha())) {
+						query += " senha ='" + TxtSenha.getText() + "',";
+						usu.setSenha(TxtSenha.getText());
+					}
+					if (!txtFoto.getText().equals(usu.getFoto())) {
+					    query += " foto='" + txtFoto.getText() + "',";
+					    usu.setFoto(txtFoto.getText());
+					    telaPrincipal.atualizarFotoENome(usu.getFoto(), usu.getNome());
+					    perfil.atualizarFotoENomeEEmail(usu.getFoto(), usu.getNome(), usu.getEmail());
+					}
+					query = query.substring(0, query.length() - 1); // Remover a vírgula final
+					query += " WHERE id='" + usu.getId() + "'";
+					int rowsUpdated = stmt.executeUpdate(query);
+					JOptionPane.showMessageDialog(null, "Informações atualizadas com sucesso!");
+					dispose();
+				} catch (SQLException ex) {
+					ex.printStackTrace();
+				}
+			}
+		});
+		getContentPane().add(btnAtualizar);
+	}
+
+	public void Deletar(Usuario usu) {
+		try {
+			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+			Statement stmt = conn.createStatement();
+			String query = "DELETE FROM usuario WHERE id = '" + usu.getId() + "'";
+			int rowsDeleted = stmt.executeUpdate(query);
+			if (rowsDeleted > 0) {
+				JOptionPane.showMessageDialog(null, "Conta excluída com sucesso!");
+			} else {
+				JOptionPane.showMessageDialog(null,
+						"Erro ao excluir conta. Verifique o nome de usuário e tente novamente.");
+			}
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			JOptionPane.showMessageDialog(null,
+					"Erro ao excluir conta. Verifique o nome de usuário e tente novamente.");
+		}
+	}
+}
+
+
