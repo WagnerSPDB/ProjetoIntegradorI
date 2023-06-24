@@ -1,0 +1,207 @@
+package Telas;
+
+import java.awt.EventQueue;
+import java.awt.Image;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import Classes.Usuario;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Color;
+import java.awt.Font;
+
+public class TelaPerfil extends JFrame {
+
+	private JPanel contentPane;
+	private Usuario usu;
+	private TelaPrincipal telaPrincipal;
+	private JLabel lblFoto;
+	private JLabel lblNome;
+	private JLabel lblEmail;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Usuario usu = new Usuario();
+					TelaPrincipal telaPrincipal = new TelaPrincipal(usu);
+					TelaPerfil frame = new TelaPerfil(usu, telaPrincipal);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public void chamarTelaLogin() {
+		TelaLogin login = new TelaLogin();
+		login.setVisible(true);
+		login.setLocationRelativeTo(null);
+		TelaPrincipal prin = new TelaPrincipal(usu);
+		prin.dispose();
+		// Encerra a tela atual
+		dispose();
+	}
+	/**
+	 * Create the frame.
+	 */
+	public TelaPerfil(Usuario usuario, TelaPrincipal telaPrincipal) {
+		setTitle("Perfil ");
+		this.usu = usuario;
+		this.telaPrincipal = telaPrincipal;
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 361, 383);
+		contentPane = new JPanel();
+		contentPane.setBackground(new Color(255, 255, 255));
+		setLocationRelativeTo(null);
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+
+		setContentPane(contentPane);
+
+		JButton btnEditar = new JButton("Editar Conta");
+		btnEditar.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 11));
+		btnEditar.setForeground(new Color(255, 255, 255));
+		btnEditar.setBorder(null);
+		btnEditar.setBackground(new Color(51, 153, 0));
+		btnEditar.setBounds(115, 228, 115, 23);
+		btnEditar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaAtualizar atualizar = new TelaAtualizar(usu, telaPrincipal, TelaPerfil.this);
+				atualizar.setVisible(true);
+			}
+		});
+		contentPane.setLayout(null);
+		
+		ImageIcon imageIcon = new ImageIcon(usu.getFoto());
+		Image imagem = imageIcon.getImage().getScaledInstance(115, 95, Image.SCALE_DEFAULT);
+		imageIcon = new ImageIcon(imagem);
+		contentPane.add(btnEditar);
+
+		JButton btnExcluir = new JButton("Excuir Conta");
+		btnExcluir.setBounds(115, 262, 115, 23);
+		btnExcluir.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 11));
+		btnExcluir.setForeground(new Color(255, 255, 255));
+		btnExcluir.setBorder(null);
+		btnExcluir.setBackground(new Color(51, 153, 0));
+		btnExcluir.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja deletar a conta?", "Atenção",
+						JOptionPane.YES_NO_OPTION);
+				if (sair == JOptionPane.YES_OPTION) {
+					TelaAtualizar atualizar = new TelaAtualizar(usu, telaPrincipal, TelaPerfil.this);
+					atualizar.Deletar(usu);
+					atualizar.setLocationRelativeTo(null);
+					TelaLogin login = new TelaLogin();
+					login.setVisible(true);
+					login.setLocationRelativeTo(null);
+					TelaPrincipal principal = new TelaPrincipal(usu);
+					principal.dispose();
+				}
+			}
+		});
+		contentPane.add(btnExcluir);
+
+		JPanel panelFoto = new JPanel();
+		panelFoto.setBounds(115, 24, 115, 95);
+		contentPane.add(panelFoto);
+		panelFoto.setLayout(null);
+		
+		lblFoto = new JLabel(imageIcon);
+		lblFoto.setBounds(0, 0, 115, 95);
+		panelFoto.add(lblFoto);
+
+		lblNome = new JLabel(usu.getNome());
+		lblNome.setBounds(93, 130, 160, 14);
+		lblNome.setHorizontalAlignment(SwingConstants.CENTER);
+		contentPane.add(lblNome);
+
+		lblEmail = new JLabel(usu.getEmail());
+		lblEmail.setBounds(78, 170, 194, 14);
+		lblEmail.setHorizontalAlignment(SwingConstants.CENTER);
+		contentPane.add(lblEmail);
+		
+		JButton btnSair = new JButton("Sair da conta");
+		btnSair.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 11));
+		btnSair.setForeground(new Color(255, 255, 255));
+		btnSair.setBorder(null);
+		btnSair.setBackground(new Color(51, 153, 0));
+		btnSair.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// exibe uma caixa de dialogo
+				int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair?", "Atenção",
+						JOptionPane.YES_NO_OPTION);
+				if (sair == JOptionPane.YES_OPTION) {
+					chamarTelaLogin();
+				}
+			}
+		});
+		btnSair.setBounds(115, 296, 115, 23);
+		contentPane.add(btnSair);
+		
+		JLabel lblNewLabel = new JLabel("Nome:");
+		lblNewLabel.setBounds(37, 130, 46, 14);
+		contentPane.add(lblNewLabel);
+		
+		JLabel lblNewLabel_1 = new JLabel("Email:");
+		lblNewLabel_1.setBounds(37, 170, 46, 14);
+		contentPane.add(lblNewLabel_1);
+	}
+
+	public void atualizarFotoENomeEEmail(String novaFoto, String novoNome, String novoEmail) {
+		atualizarFoto(novaFoto);
+		atualizarNome(novoNome);
+		atualizarEmail(novoEmail);
+	}
+
+	public void atualizarFoto(String novaFoto) {
+		ImageIcon imageIcon = new ImageIcon(novaFoto);
+		Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+		imageIcon = new ImageIcon(image);
+		lblFoto.setIcon(imageIcon);
+	}
+
+	public void atualizarNome(String novoNome) {
+		lblNome.setText(novoNome);
+	}
+
+	public void atualizarEmail(String novoEmail) {
+		lblEmail.setText(novoEmail);
+	}
+
+	protected JLabel getLblFoto() {
+		return lblFoto;
+	}
+
+	protected void setLblFoto(JLabel lblFoto) {
+		this.lblFoto = lblFoto;
+	}
+
+	protected JLabel getLblNome() {
+		return lblNome;
+	}
+
+	protected void setLblNome(JLabel lblNome) {
+		this.lblNome = lblNome;
+	}
+
+	protected JLabel getLblEmail() {
+		return lblEmail;
+	}
+
+	protected void setLblEmail(JLabel lblEmail) {
+		this.lblEmail = lblEmail;
+	}
+}
