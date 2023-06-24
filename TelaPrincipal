@@ -2,52 +2,162 @@ package Telas;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.AbstractTableModel;
+
+import Classes.Usuario;
+
 import javax.swing.JMenuBar;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JLabel;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.Image;
 import java.awt.Color;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
+
 import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.event.ActionEvent;
 import java.awt.Component;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 public class TelaPrincipal extends JFrame {
 
 	private JPanel contentPane;
 	private JLabel lblUsuario;
 	private JLabel lblFoto;
-	private String usuario, foto, email, senha;  
+	private String usuario, foto, email, senha;
 	private int id;
-	
-    public void chamarTelaLogin() {
+
+	public void chamarTelaLogin() {
 		TelaLogin login = new TelaLogin();
 		login.setVisible(true);
 		login.setLocationRelativeTo(null);
-		 // Encerra a tela atual
-		 dispose();
-    }
-		
-	public TelaPrincipal(String usuario, String email, String senha, String foto, int id) {
-		 this.usuario = usuario;
-	     this.foto = foto;
-	     this.email = email;
-	     this.senha = senha;
-	     this.id = id;
+		// Encerra a tela atual
+		dispose();
+	}
+	
 
+	public class CampeonatoTableModel extends AbstractTableModel {
+	    private List<Competicao> campeonatos;
+	    private String[] colunas = {"ID", "Nome", "Local", "Data"};
+
+	    public CampeonatoTableModel(List<Competicao> campeonatos) {
+	        this.campeonatos = campeonatos;
+	    }
+
+	    @Override
+	    public int getRowCount() {
+	        return campeonatos.size();
+	    }
+
+	    @Override
+	    public int getColumnCount() {
+	        return colunas.length;
+	    }
+
+	    @Override
+	    public String getColumnName(int columnIndex) {
+	        return colunas[columnIndex];
+	    }
+
+	    @Override
+	    public Object getValueAt(int rowIndex, int columnIndex) {
+	    	Competicao Competicao = campeonatos.get(rowIndex);
+
+	        switch (columnIndex) {
+	            case 0:
+	                return Competicao.getId();
+	            case 1:
+	                return Competicao.getNomeCompeticao();
+	            case 2:
+	        //        return Competicao.getLocal();
+	            	 return Competicao.getQuantidadeTimes();
+	            case 3:
+	       //         return Competicao.getData();
+	            default:
+	                return null;
+	        }
+	    }
+	}
+	
+	public List<Competicao> buscarCampeonatosDoUsuario(String nomeUsuario) {
+	    List<Competicao> campeonatos = new ArrayList<>();
+
+	    try {
+	        // Estabelecer a conexão com o banco de dados
+	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+
+	        // Consulta SQL para buscar os campeonatos do usuário
+	        String query = "SELECT c.id, c.nome, c.qntTime FROM competicao c " +
+	                       "INNER JOIN usuario u ON c.idUsuario = u.id " +
+	                       "WHERE u.nome = ?";
+	        
+	        // Criar o statement preparado
+	        PreparedStatement statement = connection.prepareStatement(query);
+	        statement.setString(1, nomeUsuario);
+
+	        // Executar a consulta e obter o resultado
+	        ResultSet resultSet = statement.executeQuery();
+
+	        // Processar o resultado da consulta
+	        while (resultSet.next()) {
+	            int id = resultSet.getInt("id");
+	            String nome = resultSet.getString("nome");
+	          //  String local = resultSet.getString("local");
+	          //  Date data = resultSet.getDate("data");
+
+	            // Criar objeto Campeonato com os dados do resultado
+	            Competicao campeonato = new Competicao(id, nome);
+	            campeonatos.add(campeonato);
+	        }
+
+	        // Fechar os recursos
+	        resultSet.close();
+	        statement.close();
+	        connection.close();
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return campeonatos;
+	}
+
+	public void exibirBotaoCadastrarCampeonato() {
+	    JButton btnCadastrarCampeonato = new JButton("Cadastrar Campeonato");
+
+	    // Adicionar um ouvinte de evento para o botão
+	    btnCadastrarCampeonato.addActionListener(new ActionListener() {
+	        @Override
+	        public void actionPerformed(ActionEvent e) {
+	            TelaCompeticao comp = new TelaCompeticao();
+	            comp.setVisible(rootPaneCheckingEnabled);
+	        }
+	    });
+
+	    // Adicione o botão à tela do JFrame TelaPrincipal
+	    getContentPane().add(btnCadastrarCampeonato);
+	}
+
+
+	public TelaPrincipal(Usuario usu) {
 
 		setResizable(false);
 		setTitle("Sistema de controle");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(200, 200, 1023, 706);
+		setBounds(200, 200, 1024, 768);
 
 		contentPane = new JPanel(new GridBagLayout());
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -58,45 +168,61 @@ public class TelaPrincipal extends JFrame {
 		panel_1.setBackground(Color.WHITE);
 		panel_1.setBounds(0, 0, 1007, 645);
 		contentPane.add(panel_1);
+		panel_1.setLayout(null);
+
 		
-		
-		ImageIcon imageIcon = new ImageIcon(foto);
-        Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+		ImageIcon imageIcon = new ImageIcon(usu.getFoto());
+        Image image = imageIcon.getImage().getScaledInstance(53, 48, Image.SCALE_SMOOTH);
         imageIcon = new ImageIcon(image);
         lblFoto = new JLabel(imageIcon);
+        lblFoto.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		TelaPerfil perfil = new TelaPerfil(usu, TelaPrincipal.this);
+                perfil.setVisible(true);
+        	}
+        });
+        panel_1.add(lblFoto);
+		lblFoto.setBounds(943, 11, 53, 48);
 
-				lblUsuario = new JLabel("Usuário");
-				lblUsuario.setHorizontalAlignment(SwingConstants.CENTER);
+				lblUsuario = new JLabel(usu.getNome());
+				lblUsuario.setBounds(827, 11, 129, 24);
+				panel_1.add(lblUsuario);
 				lblUsuario.setForeground(new Color(0, 128, 64));
 				lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 18));
 				
 						JPanel panel = new JPanel();
+						panel.setBounds(943, 11, 54, 50);
+						panel_1.add(panel);
 						panel.setLayout(null);
-						GroupLayout gl_panel_1 = new GroupLayout(panel_1);
-						gl_panel_1.setHorizontalGroup(
-							gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addGap(926)
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblFoto, GroupLayout.PREFERRED_SIZE, 53, GroupLayout.PREFERRED_SIZE)
-										.addComponent(panel, GroupLayout.PREFERRED_SIZE, 54, GroupLayout.PREFERRED_SIZE)))
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addGap(882)
-									.addComponent(lblUsuario, GroupLayout.PREFERRED_SIZE, 125, GroupLayout.PREFERRED_SIZE))
-						);
-						gl_panel_1.setVerticalGroup(
-							gl_panel_1.createParallelGroup(Alignment.LEADING)
-								.addGroup(gl_panel_1.createSequentialGroup()
-									.addGap(11)
-									.addGroup(gl_panel_1.createParallelGroup(Alignment.LEADING)
-										.addComponent(lblFoto, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
-										.addComponent(panel, GroupLayout.PREFERRED_SIZE, 50, GroupLayout.PREFERRED_SIZE))
-									.addGap(9)
-									.addComponent(lblUsuario, GroupLayout.PREFERRED_SIZE, 24, GroupLayout.PREFERRED_SIZE))
-						);
-						panel_1.setLayout(gl_panel_1);
-								
-								
+		
+		JButton btnCadastrarCampeonato = new JButton("Cadastrar Campeonato");
+		btnCadastrarCampeonato.setBounds(441, 531, 191, 23);
+		panel_1.add(btnCadastrarCampeonato);
+		
+		JLabel lblMensagem = new JLabel("\"\"");
+		lblMensagem.setBounds(351, 332, 466, 70);
+		panel_1.add(lblMensagem);
+		
+		// Código para o login do usuário
+		String nomeUsuario = "Nome do usuário"; // Nome do usuário logado
+		List<Competicao> campeonatos = buscarCampeonatosDoUsuario(nomeUsuario);
+
+		if (campeonatos.isEmpty()) {
+		    // Usuário não possui campeonatos cadastrados
+			lblMensagem.setText("Esse usuário não possui nenhum campeonato cadastrado");
+		    exibirBotaoCadastrarCampeonato();
+		} else {
+		    // Preencher a tabela com os campeonatos encontrados
+		    CampeonatoTableModel model = new CampeonatoTableModel(campeonatos);
+		    JTable tabelaCampeonatos = new JTable(model);
+
+		    // Adicionar a tabela à tela do JFrame TelaPrincipal
+		    JScrollPane scrollPane = new JScrollPane(tabelaCampeonatos);
+		    // Adicione o JScrollPane onde deseja exibir a tabela
+		    panel_1.add(scrollPane);
+		}
+
 		JMenuBar Menu = new JMenuBar();
 		Menu.setAlignmentY(Component.BOTTOM_ALIGNMENT);
 		Menu.setBorder(null);
@@ -110,6 +236,14 @@ public class TelaPrincipal extends JFrame {
 		Menu.add(MenCad);
 
 		JMenuItem MenCadCli = new JMenuItem("Competições");
+		MenCadCli.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaTesteTime time = new TelaTesteTime(id);
+				time.setIdUsuario(id);
+				setLocationRelativeTo(null);
+				time.setVisible(rootPaneCheckingEnabled);
+			}
+		});
 		MenCad.add(MenCadCli);
 
 		JMenuItem MenCadOs = new JMenuItem("Partidas");
@@ -126,57 +260,6 @@ public class TelaPrincipal extends JFrame {
 		});
 		MenCad.add(MenCadUsu);
 
-		JMenu mnNewMenu = new JMenu("Conta");
-		mnNewMenu.setBackground(new Color(0, 128, 0));
-		mnNewMenu.setForeground(Color.WHITE);
-		Menu.add(mnNewMenu);
-		
-		TelaPrincipal principal = this;
-		JMenuItem mntmNewMenuItem = new JMenuItem("Editar Conta");
-		mntmNewMenuItem.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			TelaAtualizar atualizar = new TelaAtualizar(usuario, email, senha, foto);
-			setLocationRelativeTo(null);
-			atualizar.setTelaPrincipal(principal);
-			atualizar.setVisible(true);
-			}
-		});
-		mnNewMenu.add(mntmNewMenuItem);
-
-		JMenuItem mntmNewMenuItem_1 = new JMenuItem("Deletar Conta");
-		mntmNewMenuItem_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja deletar a conta?", "Atenção", JOptionPane.YES_NO_OPTION);
-				if (sair == JOptionPane.YES_OPTION) {
-				TelaAtualizar atualizar = new TelaAtualizar(usuario, email, senha, foto);
-				atualizar.Deletar();
-				atualizar.setLocationRelativeTo(null);
-				TelaLogin login = new TelaLogin();
-				login.setVisible(true);
-				login.setLocationRelativeTo(null);
-				TelaPrincipal principal = new TelaPrincipal(usuario, email, senha, foto, id);
-				principal.dispose();
-				}
-			}
-		});
-		mnNewMenu.add(mntmNewMenuItem_1);
-
-		JMenu MenOpc = new JMenu("Opções");
-		MenOpc.setForeground(Color.WHITE);
-		Menu.add(MenOpc);
-	
-		JMenuItem MenOpcSai = new JMenuItem("Sair");
-		MenOpcSai.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				// exibe uma caixa de dialogo
-				int sair = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja sair?", "Atenção", JOptionPane.YES_NO_OPTION);
-				if (sair == JOptionPane.YES_OPTION) {
-					chamarTelaLogin();
-				}
-			}
-		});
-		MenOpc.add(MenOpcSai);
-
 		JMenu MenAju = new JMenu("Ajuda");
 		MenAju.setForeground(Color.WHITE);
 		Menu.add(MenAju);
@@ -191,17 +274,17 @@ public class TelaPrincipal extends JFrame {
 		});
 		MenAju.add(MenAjuSob);
 	}
-
+	
 
 	public void setLblUsuario(JLabel lblUsuario) {
 		this.lblUsuario = lblUsuario;
 	}
-	
+
 	public JLabel getLblUsuario() {
 		return lblUsuario;
 	}
-	
-    public JLabel getLblFoto() {
+
+	public JLabel getLblFoto() {
 		return lblFoto;
 	}
 
@@ -226,7 +309,7 @@ public class TelaPrincipal extends JFrame {
 		ImageIcon fotoPerfil = new ImageIcon(foto);
 		Image image = fotoPerfil.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
 		fotoPerfil = new ImageIcon(image);
-        lblFoto.setIcon(fotoPerfil);
+		lblFoto.setIcon(fotoPerfil);
 	}
 
 	public String getEmail() {
@@ -244,18 +327,30 @@ public class TelaPrincipal extends JFrame {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
+	public void atualizarFotoENome(String novaFoto, String novoNome) {
+	    atualizarFoto(novaFoto);
+	    atualizarNome(novoNome);
+	}
 
-public static void main(String[] args) {
+	public void atualizarFoto(String novaFoto) {
+	    ImageIcon imageIcon = new ImageIcon(novaFoto);
+	    Image image = imageIcon.getImage().getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+	    imageIcon = new ImageIcon(image);
+	    lblFoto.setIcon(imageIcon);
+	}
 
-    String usuario = "user123";
-    String CaminhoFoto = "";
-    String email = "user@gmail.com";
-    String senha = "12345";
-    int id = 1;
-    new TelaPrincipal(usuario, email, senha, CaminhoFoto, id);
-	
-	TelaPrincipal principal = new TelaPrincipal(usuario, email, senha, CaminhoFoto, id);
-	principal.setVisible(true);
-	principal.setLocationRelativeTo(null);
-}	
+	public void atualizarNome(String novoNome) {
+	    lblUsuario.setText(novoNome);
+	}
+
+
+	public static void main(String[] args) {
+
+		Usuario usu = new Usuario();
+		new TelaPrincipal(usu);
+
+		TelaPrincipal principal = new TelaPrincipal(usu);
+		principal.setVisible(true);
+		principal.setLocationRelativeTo(null);
+	}
 }
