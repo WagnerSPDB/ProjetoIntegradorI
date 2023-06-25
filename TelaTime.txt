@@ -3,14 +3,18 @@ package Telas;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import Telas.Time;
+import Classes.Time;
+import Classes.TimeDAO;
+
 import javax.imageio.ImageIO;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -45,169 +49,28 @@ public class TelaTime extends JFrame {
 	private JLabel lblAbreviacao;
 	private JButton btnAlterar;
 	private JLabel lblFoto;
-	private JTextField txtNomeDel;
+	private JTextField txtIdDel;
 	private JTextField txtNomeAlt;
 	private JTextField txtAbreviacaoAlt;
 	private JLabel lblFotoAlt;
 	private int idUsuario;
 
-	private JLabel lblTime;
-	Time teste;
-	private JTextField txtTeste;
+	private JLabel lblFotoBuscar;
+	private JTextField txtAbreviacaoBuscar;
 
-	// instanciar objeto para o fluxo de bytes
-	private FileInputStream fis;
-
-	// variavel global pra armazenar o tamanho da imagem
-	private int tamanho;
+	private JTextField txtFoto;
+	private JTextField txtFotoAlt;
+	private JTextField txtId;
+	private JTextField txtIdBuscar;
 
 	/**
 	 * Launch the application.
 	 */
 
-	public void cadastrarTime() {
-
-		try {
-			String sql = "insert into time (nome, abreviacao, foto, Id_usuario) values (?,?,?,?)";
-			pst = conexao.prepareStatement(sql);
-			pst.setString(1, txtNome.getText());
-			pst.setString(2, txtAbreviacao.getText());
-			pst.setBlob(3, fis, tamanho);
-			System.out.println("criar: " + idUsuario);
-			pst.setInt(4, idUsuario);
-			// validação dos campos obrigatorios
-			if (txtNome.getText().isEmpty() || txtAbreviacao.getText().isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
-			} else {
-				int adicionado = pst.executeUpdate();
-				System.out.println(adicionado);
-				if (adicionado > 0) {
-					JOptionPane.showMessageDialog(null, "Usuário adicionado com sucesso");
-					txtNome.setText(null);
-					txtAbreviacao.setText(null);
-					lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
-
-				}
-			}
-		} catch (SQLException e) {
-			System.out.println(e);
-		}
-	}
-
-
-	private void alterarTime() {
-		String sql = "update time set abreviacao=?, foto=? where nome=?";
-		try {
-			pst = conexao.prepareStatement(sql);
-			pst.setString(1, txtAbreviacaoAlt.getText());
-			pst.setString(3, txtNomeAlt.getText());
-			pst.setBlob(2, fis, tamanho);
-
-			if (txtNomeAlt.getText().isEmpty() || txtAbreviacaoAlt.getText().isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
-			} else {
-				int adicionado = pst.executeUpdate();
-				System.out.println(adicionado);
-				if (adicionado > 0) {
-					JOptionPane.showMessageDialog(null, "Dados alterados com sucesso");
-					txtNomeAlt.setText(null);
-					txtAbreviacaoAlt.setText(null);
-					lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
-					lblFotoAlt.updateUI();
-				}
-			}
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
-	private void removerTime() {
-		int confirma = JOptionPane.showConfirmDialog(null, "Tem certeza que deseja remover?");
-		if (confirma == JOptionPane.YES_OPTION) {
-			String sql = "delete from time where nome=?";
-			try {
-				pst = conexao.prepareStatement(sql);
-				pst.setString(1, txtNomeDel.getText());
-				int apagado = pst.executeUpdate();
-				if (apagado > 0) {
-					JOptionPane.showMessageDialog(null, "Time removido com sucesso");
-					txtNomeDel.setText(null);
-				}
-			} catch (Exception e) {
-				System.out.println(e);
-			}
-		} else {
-
-		}
-	}
-
-	private void carregarFoto() {
-		JFileChooser jfc = new JFileChooser();
-		jfc.setDialogTitle("Selecionar arquivo");
-		jfc.setFileFilter(
-				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
-		int resultado = jfc.showOpenDialog(this);
-		if (resultado == JFileChooser.APPROVE_OPTION) {
-			try {
-				fis = new FileInputStream(jfc.getSelectedFile());
-				tamanho = (int) jfc.getSelectedFile().length();
-				Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(lblFoto.getWidth(),
-						lblFoto.getHeight(), Image.SCALE_SMOOTH);
-				lblFoto.setIcon(new ImageIcon(foto));
-				lblFoto.updateUI();
-			} catch (Exception e) {
-				System.out.println(e);
-			}
-		}
-	}
-
-	private void carregarFotoAlt() {
-		JFileChooser jfc = new JFileChooser();
-		jfc.setDialogTitle("Selecionar arquivo");
-		jfc.setFileFilter(
-				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
-		int resultado = jfc.showOpenDialog(this);
-		if (resultado == JFileChooser.APPROVE_OPTION) {
-			try {
-				fis = new FileInputStream(jfc.getSelectedFile());
-				tamanho = (int) jfc.getSelectedFile().length();
-				Image foto = ImageIO.read(jfc.getSelectedFile()).getScaledInstance(lblFotoAlt.getWidth(),
-						lblFotoAlt.getHeight(), Image.SCALE_SMOOTH);
-				lblFotoAlt.setIcon(new ImageIcon(foto));
-				lblFotoAlt.updateUI();
-			} catch (Exception e) {
-				System.out.println(e);
-			}
-		}
-	}
-
-	public void recuperarTime(Time time) {
-		try {
-			String sql = "select * from time where nome=?";
-			pst = conexao.prepareStatement(sql);
-			pst.setString(1, time.getNome());
-			rs = pst.executeQuery();
-			if (rs.next()) {
-				txtTeste.setText(rs.getString(3));
-				byte[] fotoDado = rs.getBytes(4);
-				ImageIcon imageIcon = new ImageIcon(fotoDado);
-				Image image = imageIcon.getImage().getScaledInstance(256, 256, Image.SCALE_DEFAULT);
-				lblTime.setIcon(new ImageIcon(image));
-			} else {
-				JOptionPane.showMessageDialog(null, "Time não cadastrado");
-				txtTeste.setText(null);
-			}
-
-		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e);
-		}
-	}
-
 	/**
 	 * Create the frame.
 	 */
-	public TelaTime(int id) {
-		this.idUsuario = id;
+	public TelaTime(int idUsuario) {
 
 		conexao = ModuloConexao.conector();
 		setResizable(false);
@@ -278,11 +141,30 @@ public class TelaTime extends JFrame {
 		btnTime.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnTime.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				cadastrarTime();
+				if (txtNome.getText().isEmpty() || txtAbreviacao.getText().isEmpty() || txtFoto.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
+				} else {
+					Time time = new Time();
+					time.setNome(txtNome.getText());
+					time.setAbreviacao(txtAbreviacao.getText());
+					time.setFoto(txtFoto.getText());
+					time.setIdUsuario(idUsuario);
+					TimeDAO chama = new TimeDAO();
+					chama.cadastrarTime(time);
+				}
+				txtNome.setText(null);
+				txtAbreviacao.setText(null);
+				txtFoto.setText(null);
+				lblFoto.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 			}
 		});
 		btnTime.setBounds(199, 253, 111, 31);
 		inserir.add(btnTime);
+
+		txtFoto = new JTextField();
+		txtFoto.setBounds(361, 234, 96, 19);
+		inserir.add(txtFoto);
+		txtFoto.setColumns(10);
 
 		JButton btnRemover = new JButton("Remover");
 		btnRemover.setBorder(null);
@@ -291,21 +173,24 @@ public class TelaTime extends JFrame {
 		btnRemover.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnRemover.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				removerTime();
+				TimeDAO chama = new TimeDAO();
+				int id = Integer.parseInt(txtIdDel.getText());
+				chama.removerTime(id);
+				txtIdDel.setText(null);
 			}
 		});
 		deletar.setLayout(null);
 		btnRemover.setBounds(193, 121, 107, 35);
 		deletar.add(btnRemover);
 
-		JLabel lblInsiraONome = new JLabel("Insira o nome do time que deseja deletar:");
+		JLabel lblInsiraONome = new JLabel("Insira o id do time que deseja deletar:");
 		lblInsiraONome.setBounds(26, 45, 236, 14);
 		deletar.add(lblInsiraONome);
 
-		txtNomeDel = new JTextField();
-		txtNomeDel.setBounds(304, 42, 144, 20);
-		deletar.add(txtNomeDel);
-		txtNomeDel.setColumns(10);
+		txtIdDel = new JTextField();
+		txtIdDel.setBounds(304, 42, 144, 20);
+		deletar.add(txtIdDel);
+		txtIdDel.setColumns(10);
 
 		JButton btnCarregarAlt = new JButton("Carregar foto");
 		btnCarregarAlt.setBorder(null);
@@ -328,7 +213,23 @@ public class TelaTime extends JFrame {
 		btnAlterar.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 		btnAlterar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				alterarTime();
+				if (txtNomeAlt.getText().isEmpty() || txtAbreviacaoAlt.getText().isEmpty()
+						|| txtFotoAlt.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Preencha todos os campos obrigatórios");
+				} else {
+					Time time = new Time();
+					time.setNome(txtNomeAlt.getText());
+					time.setAbreviacao(txtAbreviacaoAlt.getText());
+					time.setFoto(txtFotoAlt.getText());
+					time.setIdTime(Integer.parseInt(txtId.getText()));
+					time.setIdUsuario(idUsuario);
+					TimeDAO chama = new TimeDAO();
+					chama.alterarTime(time);
+				}
+				txtNomeAlt.setText(null);
+				txtAbreviacaoAlt.setText(null);
+				txtFotoAlt.setText(null);
+				lblFotoAlt.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
 			}
 		});
 		alterar.setLayout(null);
@@ -336,22 +237,22 @@ public class TelaTime extends JFrame {
 		alterar.add(btnAlterar);
 		aba.addTab("Remover", deletar);
 
-		JLabel lblNewLabel = new JLabel("Insira o nome do time que deseja alterar:");
-		lblNewLabel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
-		lblNewLabel.setBounds(20, 37, 300, 14);
-		alterar.add(lblNewLabel);
+		JLabel lblNomeAlt = new JLabel("Nome:");
+		lblNomeAlt.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		lblNomeAlt.setBounds(20, 67, 83, 14);
+		alterar.add(lblNomeAlt);
 
 		txtNomeAlt = new JTextField();
-		txtNomeAlt.setBounds(20, 60, 183, 20);
+		txtNomeAlt.setBounds(20, 91, 183, 20);
 		alterar.add(txtNomeAlt);
 		txtNomeAlt.setColumns(10);
 
-		JLabel lblNewLabel_1 = new JLabel("Abreviação:");
-		lblNewLabel_1.setBounds(20, 91, 83, 14);
-		alterar.add(lblNewLabel_1);
+		JLabel lblAbreviacaoAlt = new JLabel("Abreviação:");
+		lblAbreviacaoAlt.setBounds(20, 121, 83, 14);
+		alterar.add(lblAbreviacaoAlt);
 
 		txtAbreviacaoAlt = new JTextField();
-		txtAbreviacaoAlt.setBounds(20, 116, 86, 20);
+		txtAbreviacaoAlt.setBounds(20, 145, 86, 20);
 		alterar.add(txtAbreviacaoAlt);
 		txtAbreviacaoAlt.setColumns(10);
 
@@ -362,35 +263,56 @@ public class TelaTime extends JFrame {
 		lblFotoAlt.setBounds(309, 25, 140, 140);
 		alterar.add(lblFotoAlt);
 
+		txtFotoAlt = new JTextField();
+		txtFotoAlt.setBounds(339, 217, 96, 19);
+		alterar.add(txtFotoAlt);
+		txtFotoAlt.setColumns(10);
+		
+		JLabel lblId = new JLabel("Digite o ID:");
+		lblId.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		lblId.setBounds(20, 10, 83, 14);
+		alterar.add(lblId);
+		
+		txtId = new JTextField();
+		txtId.setColumns(10);
+		txtId.setBounds(20, 34, 83, 20);
+		alterar.add(txtId);
+
 		JPanel buscar = new JPanel();
 		buscar.setBorder(null);
 		buscar.setBackground(new Color(255, 255, 255));
 		aba.addTab("Buscar", buscar);
 		buscar.setLayout(null);
+		
+		txtIdBuscar = new JTextField();
+		txtIdBuscar.setBounds(48, 178, 96, 19);
+		buscar.add(txtIdBuscar);
+		txtIdBuscar.setColumns(10);
+		
+		txtAbreviacaoBuscar = new JTextField();
+		txtAbreviacaoBuscar.setBounds(176, 178, 96, 19);
+		buscar.add(txtAbreviacaoBuscar);
+		txtAbreviacaoBuscar.setColumns(10);
 
-		txtTeste = new JTextField();
-		txtTeste.setBounds(331, 225, 96, 19);
-		buscar.add(txtTeste);
-		txtTeste.setColumns(10);
-
-		lblTime = new JLabel("");
-		lblTime.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTime.setHorizontalTextPosition(SwingConstants.CENTER);
-		lblTime.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
-		lblTime.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
-		lblTime.setBounds(311, 28, 140, 140);
-		buscar.add(lblTime);
+		lblFotoBuscar = new JLabel("");
+		lblFotoBuscar.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFotoBuscar.setHorizontalTextPosition(SwingConstants.CENTER);
+		lblFotoBuscar.setIcon(new ImageIcon(TelaTime.class.getResource("/Icones/camera.png")));
+		lblFotoBuscar.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		lblFotoBuscar.setBounds(314, 68, 140, 140);
+		buscar.add(lblFotoBuscar);
 
 		JComboBox<Time> cbxTime = new JComboBox<>();
 		cbxTime.setModel(new DefaultComboBoxModel(new String[] { "Selecione" }));
 		cbxTime.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (cbxTime.getSelectedItem() == "Selecione") {
-					txtTeste.setText(null);
-					lblTime.setIcon(null);
+					txtAbreviacaoBuscar.setText(null);
+					lblFotoBuscar.setIcon(null);
+					txtIdBuscar.setText(null);
 				} else {
-					teste = (Time) cbxTime.getSelectedItem();
-					recuperarTime(teste);
+					Time cbx = (Time) cbxTime.getSelectedItem();
+					recuperarTime(cbx);
 				}
 			}
 		});
@@ -398,26 +320,26 @@ public class TelaTime extends JFrame {
 		buscar.add(cbxTime);
 
 		try {
-			String sql = "select * from time where Id_usuario = ?";
+			String sql = "select * from time where id_usuario = ?";
 			pst = conexao.prepareStatement(sql);
-			pst.setInt(1, idUsuario);
+			pst.setInt(1, 1);
 			rs = pst.executeQuery();
 			List<Time> lista = new ArrayList<>();
 
 			while (rs.next()) {
-				String nome = rs.getString("nome");
-				String abreviacao = rs.getString("abreviacao");
-				int id_usuario = rs.getInt("id_usuario");
+				Time time = new Time();
+				time.setIdTime(rs.getInt("id"));
+				time.setNome(rs.getString("nome"));
+				time.setAbreviacao(rs.getString("abreviacao"));
+				time.setIdUsuario(rs.getInt("id_usuario"));
 
 				// Criar um objeto com os valores recuperados
-				Time obj = new Time(nome, abreviacao, id_usuario);
 
 				// Adicionar o objeto à lista
-				lista.add(obj);
+				lista.add(time);
 			}
-
-			for (Time obj : lista) {
-				cbxTime.addItem(obj);
+			for (Time time : lista) {
+				cbxTime.addItem(time);
 			}
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -427,26 +349,98 @@ public class TelaTime extends JFrame {
 		lblBuscarNome.setBounds(22, 43, 302, 14);
 		buscar.add(lblBuscarNome);
 		buscar.setLayout(null);
+
+		JLabel lblAbreviacaoBuscar = new JLabel("Abreviação:");
+		lblAbreviacaoBuscar.setHorizontalAlignment(SwingConstants.CENTER);
+		lblAbreviacaoBuscar.setBounds(176, 149, 96, 14);
+		buscar.add(lblAbreviacaoBuscar);
 		
-		JLabel lblNewLabel_2 = new JLabel("Abreviação:");
-		lblNewLabel_2.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNewLabel_2.setBounds(331, 200, 96, 14);
-		buscar.add(lblNewLabel_2);
+		JLabel lblIdBuscar = new JLabel("Id:");
+		lblIdBuscar.setHorizontalAlignment(SwingConstants.CENTER);
+		lblIdBuscar.setBounds(48, 149, 96, 14);
+		buscar.add(lblIdBuscar);
+		
+		
 		contentPane.add(aba);
 	}
 
-	public int getIdUsuario() {
-		return idUsuario;
+	//public TelaTime() {}
+	private void carregarFoto() {
+		JFileChooser arquivo = new JFileChooser();
+		arquivo.setDialogTitle("SELECIONE UMA IMAGEM");
+		arquivo.setFileFilter(
+				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
+		// a linha abaixo seleciona apenas uma imagem
+		arquivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int op = arquivo.showOpenDialog(null);
+		if (op == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = arquivo.getSelectedFile();
+			txtFoto.setText(selectedFile.getAbsolutePath());
+			ImageIcon imageIcon = new ImageIcon(selectedFile.getAbsolutePath());
+			Image image = imageIcon.getImage().getScaledInstance(155, 135, Image.SCALE_DEFAULT);
+			imageIcon = new ImageIcon(image);
+			lblFoto.setIcon(imageIcon);
+		} else if (op == JFileChooser.CANCEL_OPTION) {
+			System.out.println("No Data");
+		}
 	}
 
-	public void setIdUsuario(int idUsuario) {
-		this.idUsuario = idUsuario;
+	private void carregarFotoAlt() {
+		JFileChooser arquivo = new JFileChooser();
+		arquivo.setDialogTitle("SELECIONE UMA IMAGEM");
+		arquivo.setFileFilter(
+				new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
+		// a linha abaixo seleciona apenas uma imagem
+		arquivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
+		int op = arquivo.showOpenDialog(null);
+		if (op == JFileChooser.APPROVE_OPTION) {
+			File selectedFile = arquivo.getSelectedFile();
+			txtFotoAlt.setText(selectedFile.getAbsolutePath());
+			ImageIcon imageIcon = new ImageIcon(selectedFile.getAbsolutePath());
+			Image image = imageIcon.getImage().getScaledInstance(155, 135, Image.SCALE_DEFAULT);
+			imageIcon = new ImageIcon(image);
+			lblFotoAlt.setIcon(imageIcon);
+		} else if (op == JFileChooser.CANCEL_OPTION) {
+			System.out.println("No Data");
+		}
 	}
 
+	public void recuperarTime(Time time) {
+					
+		conexao = ModuloConexao.conector();
+		try {
+			String sql = "select * from time where nome=?";
+			pst = conexao.prepareStatement(sql);
+			pst.setString(1, time.getNome());
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				String id = Integer.toString(rs.getInt(1));
+				txtIdBuscar.setText(id);
+				txtAbreviacaoBuscar.setText(rs.getString(3));
+				Image imagem = null;
+				try {
+					imagem = ImageIO.read(new File(rs.getString(4)));
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+                // Redimensiona a imagem para se ajustar ao tamanho desejado
+                Image imagemRedimensionada = imagem.getScaledInstance(140, 140, Image.SCALE_SMOOTH);
+				lblFotoBuscar.setIcon(new ImageIcon(imagemRedimensionada));
+			} else {
+				JOptionPane.showMessageDialog(null, "Time não cadastrado");
+			}
+
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+	
 	public static void main(String[] args) {
 		int id = 0;
 		TelaTime frame = new TelaTime(id);
 		frame.setVisible(true);
-
 	}
+	
+
 }
