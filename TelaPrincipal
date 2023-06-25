@@ -7,6 +7,7 @@ import javax.swing.JTable;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.AbstractTableModel;
 
+import Classes.Competicao;
 import Classes.Usuario;
 
 import javax.swing.JMenuBar;
@@ -32,6 +33,7 @@ import java.awt.event.ActionEvent;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.Cursor;
 
 public class TelaPrincipal extends JFrame {
 
@@ -39,7 +41,6 @@ public class TelaPrincipal extends JFrame {
 	private JLabel lblUsuario;
 	private JLabel lblFoto;
 	private String usuario, foto, email, senha;
-	private int id;
 
 	public void chamarTelaLogin() {
 		TelaLogin login = new TelaLogin();
@@ -98,13 +99,12 @@ public class TelaPrincipal extends JFrame {
 
 	    try {
 	        // Estabelecer a conexão com o banco de dados
-	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+	        Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/projeto", "root", "");
 
 	        // Consulta SQL para buscar os campeonatos do usuário
-	        String query = "SELECT c.id, c.nome, c.qntTime FROM competicao c " +
+	        String query = "SELECT c.id, c.nome, c.qtdTime FROM competicao c " +
 	                       "INNER JOIN usuario u ON c.idUsuario = u.id " +
 	                       "WHERE u.nome = ?";
-	        
 	        // Criar o statement preparado
 	        PreparedStatement statement = connection.prepareStatement(query);
 	        statement.setString(1, nomeUsuario);
@@ -175,6 +175,7 @@ public class TelaPrincipal extends JFrame {
         Image image = imageIcon.getImage().getScaledInstance(53, 48, Image.SCALE_SMOOTH);
         imageIcon = new ImageIcon(image);
         lblFoto = new JLabel(imageIcon);
+        lblFoto.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblFoto.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
@@ -186,7 +187,7 @@ public class TelaPrincipal extends JFrame {
 		lblFoto.setBounds(943, 11, 53, 48);
 
 				lblUsuario = new JLabel(usu.getNome());
-				lblUsuario.setBounds(827, 11, 129, 24);
+				lblUsuario.setBounds(827, 11, 108, 24);
 				panel_1.add(lblUsuario);
 				lblUsuario.setForeground(new Color(0, 128, 64));
 				lblUsuario.setFont(new Font("Tahoma", Font.BOLD, 18));
@@ -197,6 +198,14 @@ public class TelaPrincipal extends JFrame {
 						panel.setLayout(null);
 		
 		JButton btnCadastrarCampeonato = new JButton("Cadastrar Campeonato");
+		btnCadastrarCampeonato.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				TelaTesteTime time = new TelaTesteTime(usu);
+				setLocationRelativeTo(null);
+				time.setVisible(rootPaneCheckingEnabled);
+			}
+		});
+		btnCadastrarCampeonato.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnCadastrarCampeonato.setBounds(441, 531, 191, 23);
 		panel_1.add(btnCadastrarCampeonato);
 		
@@ -231,15 +240,16 @@ public class TelaPrincipal extends JFrame {
 		setJMenuBar(Menu);
 
 		JMenu MenCad = new JMenu("Cadastro");
+		MenCad.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenCad.setBackground(new Color(0, 128, 0));
 		MenCad.setForeground(Color.WHITE);
 		Menu.add(MenCad);
 
 		JMenuItem MenCadCli = new JMenuItem("Competições");
+		MenCadCli.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenCadCli.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TelaTesteTime time = new TelaTesteTime(id);
-				time.setIdUsuario(id);
+				TelaTesteTime time = new TelaTesteTime(usu);
 				setLocationRelativeTo(null);
 				time.setVisible(rootPaneCheckingEnabled);
 			}
@@ -247,13 +257,15 @@ public class TelaPrincipal extends JFrame {
 		MenCad.add(MenCadCli);
 
 		JMenuItem MenCadOs = new JMenuItem("Partidas");
+		MenCadOs.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenCad.add(MenCadOs);
 
 		JMenuItem MenCadUsu = new JMenuItem("Times");
+		MenCadUsu.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenCadUsu.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				TelaTime time = new TelaTime(id);
-				time.setIdUsuario(id);
+				TelaTime time = new TelaTime(usu.getId());
+				//time.setIdUsuario(id);
 				setLocationRelativeTo(null);
 				time.setVisible(rootPaneCheckingEnabled);
 			}
@@ -261,10 +273,12 @@ public class TelaPrincipal extends JFrame {
 		MenCad.add(MenCadUsu);
 
 		JMenu MenAju = new JMenu("Ajuda");
+		MenAju.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenAju.setForeground(Color.WHITE);
 		Menu.add(MenAju);
 
 		JMenuItem MenAjuSob = new JMenuItem("Sobre");
+		MenAjuSob.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		MenAjuSob.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// chamando a tela sobre
@@ -327,6 +341,7 @@ public class TelaPrincipal extends JFrame {
 	public void setSenha(String senha) {
 		this.senha = senha;
 	}
+	
 	public void atualizarFotoENome(String novaFoto, String novoNome) {
 	    atualizarFoto(novaFoto);
 	    atualizarNome(novoNome);
@@ -345,8 +360,9 @@ public class TelaPrincipal extends JFrame {
 
 
 	public static void main(String[] args) {
-
 		Usuario usu = new Usuario();
+		usu.setEmail("a");
+		usu.setSenha("a");
 		new TelaPrincipal(usu);
 
 		TelaPrincipal principal = new TelaPrincipal(usu);
