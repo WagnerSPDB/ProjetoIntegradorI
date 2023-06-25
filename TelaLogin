@@ -5,6 +5,9 @@ import java.sql.*;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+
+import Classes.Usuario;
+import Classes.UsuarioDAO;
 import Conexao.ModuloConexao;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -25,36 +28,6 @@ public class TelaLogin extends JFrame {
 	PreparedStatement pst = null;
 	ResultSet rs = null;
 
-	public void logar() {
-		String email = txtEmail.getText();
-		String senha = new String(txtSenha.getPassword());
-
-		String sql = "select * from usuario where email =? and senha =?";
-		try {
-			pst = conexao.prepareStatement(sql);
-			pst.setString(1, email);
-			String captura = new String(senha);
-			pst.setString(2, captura);
-			rs = pst.executeQuery();
-			if (rs.next()) {
-				String usuario = rs.getString("nome");
-				String foto = rs.getString("foto");
-				int id = rs.getInt("id");
-				TelaPrincipal principal = new TelaPrincipal(usuario, email, senha, foto, id);
-				principal.setVisible(true);
-				principal.setLocationRelativeTo(null);
-				principal.getLblUsuario().setText(rs.getString(1));
-				this.dispose();
-				conexao.close();
-			} else {
-				JOptionPane.showMessageDialog(null, "Usuário e/ou senha inválidos");
-			}
-
-		} catch (Exception e) {
-			System.out.println(e);
-		}
-	}
-
 	private JPanel contentPane;
 	private JTextField txtEmail;
 	private JPasswordField txtSenha;
@@ -69,7 +42,6 @@ public class TelaLogin extends JFrame {
 					TelaLogin frame = new TelaLogin();
 					frame.setVisible(true);
 					frame.setLocationRelativeTo(null);
-
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -80,7 +52,7 @@ public class TelaLogin extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public TelaLogin() {
+	public TelaLogin() {	
 		setForeground(new Color(255, 255, 255));
 		conexao = ModuloConexao.conector();
 		
@@ -96,7 +68,7 @@ public class TelaLogin extends JFrame {
 
 		JButton btnLogin = new JButton("Login");
 		btnLogin.setAlignmentY(Component.BOTTOM_ALIGNMENT);
-		btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnLogin.setForeground(new Color(255, 255, 255));
 		btnLogin.setBorder(null);
 		btnLogin.setFont(new Font("Arial Rounded MT Bold", Font.PLAIN, 12));
@@ -104,7 +76,11 @@ public class TelaLogin extends JFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// chamando o metodo logar
-				logar();
+				Usuario usu = new Usuario();
+				usu.setEmail(txtEmail.getText());
+				usu.setSenha(txtSenha.getText());
+				UsuarioDAO chama = new UsuarioDAO();
+				chama.logar(usu, TelaLogin.this);
 			}
 		});
 		btnLogin.setBounds(709, 477, 122, 30);
@@ -130,7 +106,7 @@ public class TelaLogin extends JFrame {
 		JButton btnConta = new JButton("Criar conta");
 		btnConta.setBorder(null);
 		btnConta.setForeground(new Color(255, 255, 255));
-		btnConta.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		btnConta.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		btnConta.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// chamando a tela Conta
