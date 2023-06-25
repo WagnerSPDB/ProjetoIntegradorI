@@ -1,0 +1,152 @@
+package Telas;
+
+import java.awt.EventQueue;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+
+import java.sql.ResultSet;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import Classes.Competicao;
+import Classes.Usuario;
+import Conexao.ModuloConexao;
+
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.SwingConstants;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+public class TelaCampeonato extends JFrame {
+
+	private JPanel contentPane;
+	private JTextField txtNome;
+	private JTextField txtQntTimes;
+	private JTextField txtPremiacao;
+	private JTextField txtLocal;
+	Competicao competicao = new Competicao();
+	private int idComp;
+	Connection conexao = null;
+	PreparedStatement pst = null;
+	ResultSet rs = null;
+
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Usuario usu = new Usuario();
+					TelaCampeonato frame = new TelaCampeonato(usu);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public void create(Usuario usu) {
+		String sql = "INSERT INTO competicao (nome, qntTime, idUsuario, premiacao, local) VALUES (?,?,?,?,?)";
+
+		try {
+			conexao = ModuloConexao.conector();
+			pst = conexao.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pst.setString(1, txtNome.getText());
+			pst.setInt(2, 8);
+			pst.setInt(3, usu.getId());
+			pst.setString(4, txtPremiacao.getText());
+			pst.setString(5, txtLocal.getText());
+		
+			pst.executeUpdate();
+			rs = pst.getGeneratedKeys();
+			if (rs.next()) {
+				idComp = rs.getInt(1);
+				TelaSelecionarTimes sel = new TelaSelecionarTimes(usu, idComp );
+				sel.setVisible(rootPaneCheckingEnabled);
+				this.dispose();
+				conexao.close();
+			}
+			
+		} catch (Exception e) {
+			System.out.println(e);
+			JOptionPane.showMessageDialog(null, e);
+		}
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public TelaCampeonato(Usuario usu) {
+		
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLocationRelativeTo(null);
+
+		setContentPane(contentPane);
+		contentPane.setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Nome do campeonato:");
+		lblNewLabel.setBounds(63, 59, 130, 14);
+		contentPane.add(lblNewLabel);
+		
+		txtNome = new JTextField();
+		txtNome.setBounds(63, 84, 86, 20);
+		contentPane.add(txtNome);
+		txtNome.setColumns(10);
+		
+		JLabel lblNewLabel_1 = new JLabel("Quantidade de times:");
+		lblNewLabel_1.setBounds(63, 134, 140, 14);
+		contentPane.add(lblNewLabel_1);
+		
+		txtQntTimes = new JTextField();
+		txtQntTimes.setHorizontalAlignment(SwingConstants.CENTER);
+		txtQntTimes.setText("8");
+		txtQntTimes.setBounds(63, 161, 86, 20);
+		contentPane.add(txtQntTimes);
+		txtQntTimes.setColumns(10);
+		
+		JLabel lblNewLabel_2 = new JLabel("Premiação:");
+		lblNewLabel_2.setBounds(254, 59, 123, 14);
+		contentPane.add(lblNewLabel_2);
+		
+		txtPremiacao = new JTextField();
+		txtPremiacao.setBounds(254, 84, 86, 20);
+		contentPane.add(txtPremiacao);
+		txtPremiacao.setColumns(10);
+		
+		JLabel lblNewLabel_3 = new JLabel("Local: ");
+		lblNewLabel_3.setBounds(254, 134, 46, 14);
+		contentPane.add(lblNewLabel_3);
+		
+		txtLocal = new JTextField();
+		txtLocal.setText("");
+		txtLocal.setBounds(254, 161, 86, 20);
+		contentPane.add(txtLocal);
+		txtLocal.setColumns(10);
+		
+		JButton btnNewButton = new JButton("Cadastrar Campeonato");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				competicao.setNomeCompeticao(txtNome.getText());
+				competicao.setQuantidadeTimes(8);
+				competicao.setPremiacao(txtPremiacao.getText());
+				competicao.setLocal(txtLocal.getText());
+				competicao.setIdUsuario(usu.getId());
+				create(usu);
+			}
+		});
+		btnNewButton.setBounds(148, 214, 152, 23);
+		contentPane.add(btnNewButton);
+	}
+}
