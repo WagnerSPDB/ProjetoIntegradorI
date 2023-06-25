@@ -11,8 +11,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 import Classes.Usuario;
+import Conexao.ModuloConexao;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -117,6 +119,8 @@ public class TelaAtualizar extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser arquivo = new JFileChooser();
 				arquivo.setDialogTitle("SELECIONE UMA IMAGEM");
+				arquivo.setFileFilter(
+						new FileNameExtensionFilter("Arquivo de imagens(*.PNG, *.JPG, *.JPEG)", "png", "jpg", "jpeg"));
 				arquivo.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				int op = arquivo.showOpenDialog(null);
 				if (op == JFileChooser.APPROVE_OPTION) {
@@ -153,7 +157,7 @@ public class TelaAtualizar extends JFrame {
 		btnAtualizar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+					Connection conn = ModuloConexao.conector();
 					Statement stmt = conn.createStatement();
 					String query = "UPDATE usuario SET";
 					if (!Txtusuario.getText().equals(usu.getNome())) {
@@ -192,7 +196,7 @@ public class TelaAtualizar extends JFrame {
 
 	public void Deletar(Usuario usu) {
 		try {
-			Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dbinfox", "root", "Cibelle2013");
+			Connection conn = ModuloConexao.conector();
 			Statement stmt = conn.createStatement();
 			String query = "DELETE FROM usuario WHERE id = '" + usu.getId() + "'";
 			int rowsDeleted = stmt.executeUpdate(query);
@@ -209,5 +213,3 @@ public class TelaAtualizar extends JFrame {
 		}
 	}
 }
-
-
