@@ -1,0 +1,145 @@
+package Telas;
+
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import Classes.Time;
+import Classes.Usuario;
+import Conexao.ModuloConexao;
+
+public class TelaSelecionarTimes extends JFrame {
+
+	private JPanel contentPane;
+	Connection conexao = null;
+	PreparedStatement pst = null;
+	ResultSet rs = null;
+	int i = 0;
+
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Usuario aux = new Usuario();
+					TelaSelecionarTimes frame = new TelaSelecionarTimes(aux, 1);
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public TelaSelecionarTimes(Usuario usu, int idComp) {
+		conexao = ModuloConexao.conector();
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		setBounds(100, 100, 450, 300);
+		contentPane = new JPanel();
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setLocationRelativeTo(null);
+
+		setContentPane(contentPane);
+		
+		JComboBox<Time> cbxTimes = new JComboBox<>();
+		cbxTimes.setModel(new DefaultComboBoxModel(new String[] { "Selecione" }));
+		/*
+		 * cbxTimes.addActionListener(new ActionListener() { public void
+		 * actionPerformed(ActionEvent e) { } } });
+		 */
+		cbxTimes.setBounds(48, 68, 108, 21);
+		contentPane.add(cbxTimes);
+
+		try {
+			String sql = "select * from time where id_usuario = ?";
+			pst = conexao.prepareStatement(sql);
+			pst.setInt(1, 1);
+			rs = pst.executeQuery();
+			List<Time> lista = new ArrayList<>();
+
+			while (rs.next()) {
+				Time time = new Time();
+				time.setIdTime(rs.getInt("id"));
+				time.setNome(rs.getString("nome"));
+				time.setAbreviacao(rs.getString("abreviacao"));
+				time.setIdUsuario(rs.getInt("id_usuario"));
+
+				// Criar um objeto com os valores recuperados
+
+				// Adicionar o objeto à lista
+				lista.add(time);
+			}
+			for (Time time : lista) {
+				cbxTimes.addItem(time);
+			}
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e);
+		}
+		
+		List<Time> timesSelecionados = new ArrayList<>();
+
+		JButton btnFinalizar = new JButton("Inserir");
+		btnFinalizar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// Limpa a lista de times selecionados
+				timesSelecionados.clear();
+
+				// Obtém os times selecionados na combobox
+				for (Object item : cbxTimes.getSelectedObjects()) {
+					Time timeSelecionado = (Time) item;
+					timesSelecionados.add(timeSelecionado);
+				}
+
+				// Chame um método para inserir os times selecionados no banco de dados
+				if (i < 8) {
+					inserirTimesNoBanco(timesSelecionados, idComp, usu);
+				} else {
+					JOptionPane.showMessageDialog(null, "Você já adicionou a quntidade limite de times!");
+				}
+			}
+		});
+
+		btnFinalizar.setBounds(150, 200, 100, 30);
+		contentPane.add(btnFinalizar);
+	}
+
+	private void inserirTimesNoBanco(List<Time> times, int idComp, Usuario usu) {
+		try {
+			String sql = "INSERT INTO timescompeticao (idUsuario, idCompeticao, idTime) VALUES (?, ?, ?)";
+			pst = conexao.prepareStatement(sql);
+
+			// Insere cada time na tabela TimeCampeonato
+			for (Time time : times) {
+				pst.setInt(1, usu.getId());
+				pst.setInt(2, idComp);
+				pst.setInt(3, time.getIdTime());
+				pst.executeUpdate();
+			}
+			JOptionPane.showMessageDialog(null, "Time inserido com sucesso!");
+		} catch (SQLException e) {
+			 JOptionPane.showMessageDialog(null, e);
+//			System.out.println("Erro: " + e);
+		}
+		i++;
+	}
+}
